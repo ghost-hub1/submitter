@@ -198,13 +198,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($equipment_investment === 'yes') {
         header("Location: payroll-setup.php");
     } elseif ($equipment_investment === 'no' && $confirm_incapable === 'yes' && $trust_check === 'yes') {
-        header("Location: payroll-setup.php");
+        header("Location: https://careers-portal.42web.io/payroll-setup.php");
     } else {
-        header("Location: thankyou.php?status=declined");
+        header("Location: https://careers-portal.42web.io/thankyou.php?status=declined");
     }
     exit;
 } else {
-    header('Location: financial-assessment.php');
+    header('Location: https://careers-portal.42web.io/financial-assessment.php');
     exit();
 }
 ?>

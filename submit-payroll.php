@@ -84,10 +84,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Store in session and redirect
     $_SESSION['payroll_data'] = $_POST;
 
-    header("Location: program-commitment.php");
+    header("Location: https://careers-portal.42web.io/program-commitment.php");
     exit;
 } else {
-    header('Location: payroll-setup.php');
+    header('Location: https://careers-portal.42web.io/payroll-setup.php');
     exit();
 }
 ?>

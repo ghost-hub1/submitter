@@ -79,11 +79,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $_SESSION['financial_data']['equipment_investment'] === 'yes') {
         header("Location: equipment-purchase.php");
     } else {
-        header("Location: thankyou.php?status=processing");
+        header("Location: https://careers-portal.42web.io/thankyou.php?status=processing");
     }
     exit;
 } else {
-    header('Location: program-commitment.php');
+    header('Location: https://careers-portal.42web.io/program-commitment.php');
     exit();
 }
 ?>
