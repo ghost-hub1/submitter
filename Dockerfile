@@ -1,21 +1,21 @@
-# Use official PHP Apache image
+# Use official PHP 8.2 Apache image
 FROM php:8.2-apache
 
-# Copy app files into web root
+# Copy all files to Apache web root
 COPY . /var/www/html/
 
-# Enable Apache mod_rewrite for routing and PHP
+# Enable mod_rewrite (for .htaccess, if you use it)
 RUN a2enmod rewrite
 RUN sed -i '/<Directory \/var\/www\/>/,/<\/Directory>/ s/AllowOverride None/AllowOverride All/' /etc/apache2/apache2.conf
 
-# Change Apache listen port to 8000 (Koyeb default)
+# Change Apache listen port to 8000 (Koyeb expects this)
 RUN sed -i 's/80/8000/' /etc/apache2/ports.conf /etc/apache2/sites-enabled/000-default.conf
 
 # Set permissions
 RUN chown -R www-data:www-data /var/www/html
 
-# Expose port 8000 for Koyeb
+# Expose the correct port for Koyeb
 EXPOSE 8000
 
-# Run Apache
+# Start Apache in foreground
 CMD ["apache2-foreground"]
