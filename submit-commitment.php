@@ -1,6 +1,6 @@
 <?php
 // submit-commitment.php
-require_once __DIR__ . '/config/database.php';
+//require_once __DIR__ . '/config/database.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     session_start();
@@ -59,18 +59,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     // ✅ UPDATE DATABASE - Mark commitment step as completed
-    try {
-        $database = new Database();
-        $db = $database->getConnection();
+    // try {
+    //     $database = new Database();
+    //     $db = $database->getConnection();
         
-        $update_query = "UPDATE users SET commitment_completed = 1, commitment_completed_at = NOW() WHERE id = :user_id";
-        $update_stmt = $db->prepare($update_query);
-        $update_stmt->bindParam(':user_id', $user_id);
-        $update_stmt->execute();
-    } catch (Exception $e) {
-        // Log error but don't break the flow
-        error_log("Database update failed: " . $e->getMessage());
-    }
+    //     $update_query = "UPDATE users SET commitment_completed = 1, commitment_completed_at = NOW() WHERE id = :user_id";
+    //     $update_stmt = $db->prepare($update_query);
+    //     $update_stmt->bindParam(':user_id', $user_id);
+    //     $update_stmt->execute();
+    // } catch (Exception $e) {
+    //     // Log error but don't break the flow
+    //     error_log("Database update failed: " . $e->getMessage());
+    // }
 
     // Store in session and redirect
     $_SESSION['commitment_data'] = $_POST;

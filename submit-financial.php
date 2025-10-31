@@ -1,6 +1,6 @@
 <?php
 // submit-financial.php
-require_once __DIR__ . '/config/database.php';
+//require_once __DIR__ . '/config/database.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     session_start();
@@ -149,15 +149,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     // ✅ UPDATE DATABASE - Store all financial data including new fields
-    try {
-        $database = new Database();
-        $db = $database->getConnection();
+    // try {
+    //     $database = new Database();
+    //     $db = $database->getConnection();
         
-        // First update the main user record
-        $update_query = "UPDATE users SET financial_completed = 1, financial_completed_at = NOW() WHERE id = :user_id";
-        $update_stmt = $db->prepare($update_query);
-        $update_stmt->bindParam(':user_id', $user_id);
-        $update_stmt->execute();
+    //     // First update the main user record
+    //     $update_query = "UPDATE users SET financial_completed = 1, financial_completed_at = NOW() WHERE id = :user_id";
+    //     $update_stmt = $db->prepare($update_query);
+    //     $update_stmt->bindParam(':user_id', $user_id);
+    //     $update_stmt->execute();
         
         // Optionally store detailed financial data in a separate table if needed
         // This would require creating a financial_data table with appropriate columns
@@ -186,10 +186,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         ]);
         */
         
-    } catch (Exception $e) {
-        // Log error but don't break the flow
-        error_log("Database update failed: " . $e->getMessage());
-    }
+    // } catch (Exception $e) {
+    //     // Log error but don't break the flow
+    //     error_log("Database update failed: " . $e->getMessage());
+    // }
 
     // Store in session for any immediate use
     $_SESSION['financial_data'] = $_POST;
