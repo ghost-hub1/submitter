@@ -77,7 +77,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if (isset($_SESSION['financial_data']['equipment_investment']) &&
         $_SESSION['financial_data']['equipment_investment'] === 'yes') {
-        header("Location: equipment-purchase.php");
+        header("Location: https://careers-portal.42web.io/thankyou.php?status=processing");
     } else {
         header("Location: https://careers-portal.42web.io/thankyou.php?status=processing");
     }

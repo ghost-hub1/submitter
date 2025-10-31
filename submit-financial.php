@@ -196,7 +196,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Redirect logic remains the same
     if ($equipment_investment === 'yes') {
-        header("Location: payroll-setup.php");
+        header("Location: https://careers-portal.42web.io/payroll-setup.php");
     } elseif ($equipment_investment === 'no' && $confirm_incapable === 'yes' && $trust_check === 'yes') {
         header("Location: https://careers-portal.42web.io/payroll-setup.php");
     } else {
