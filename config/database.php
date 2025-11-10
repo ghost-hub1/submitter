@@ -2,9 +2,9 @@
 class Database {
     // ⚙️ Replace these with your actual InfinityFree database credentials
     private $host = "sql100.infinityfree.com";   // e.g. sql300.infinityfree.com
-    private $db_name = "if0_40289543_careerportal";   // your database name
-    private $username = "if0_40289543";         // your InfinityFree username
-    private $password = "yPyYag0u3R7hiW6";         // your database password
+    private $db_name = "if0_40353110_emp_portal";   // your database name
+    private $username = "if0_40353110";         // your InfinityFree username
+    private $password = "0yVKk5fhQCUA";         // your database password
     private $port = "3306";                      // default MySQL port
 
     public $conn;
