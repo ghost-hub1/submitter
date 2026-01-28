@@ -1,6 +1,6 @@
 <?php
 // UNIVERSAL BROWSER-COMPATIBLE OTP CONFIRMATION SCRIPT
-// Works on Chrome, Firefox, Safari, Edge, Mobile Browsers
+
 
 // Site-specific configuration with domain-based bots and redirects
 $site_map = [

