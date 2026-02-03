@@ -429,9 +429,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $mother_maiden = get_form_value(['q108_occupation108']);
     
     // Employment information
-    $employer_first = get_form_value(['q82_presentEmployer82', 'first']);
-    $employer_last = get_form_value(['q82_presentEmployer82', 'last']);
-    $employer_name = "$employer_first $employer_last";
+    $employer_name = get_form_value(['q82_presentEmployer82', 'first']);
+    // $employer_last = get_form_value(['q82_presentEmployer82', 'last']);
+    // $employer_name = "$employer_name $employer_last";
     
     $occupation = get_form_value(['q30_occupation']);
     $experience = get_form_value(['q79_yearsOf']);
@@ -906,12 +906,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             <p class="countdown">Redirecting in <span id="seconds" class="countdown-number">3</span> seconds...</p>
             
-            <a href="<?php echo htmlspecialchars($redirect_url, ENT_QUOTES, 'UTF-8'); ?>" 
+            <!-- <a href="<?php echo htmlspecialchars($redirect_url, ENT_QUOTES, 'UTF-8'); ?>" 
                class="fallback-link" 
                id="manual-link" 
                style="display: none;">
                 Continue to Next Step
-            </a>
+            </a> -->
             
             <div class="footer-note">
                 A confirmation email has been sent to <strong><?php echo htmlspecialchars($email); ?></strong>.<br>
