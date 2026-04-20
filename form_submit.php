@@ -5,10 +5,10 @@
 // ============================================================================
 ob_start();
 error_reporting(E_ALL);
-ini_set('display_errors', 0); // Never show errors to end‑user in production
+ini_set('display_errors', 0);
 ini_set('log_errors', 1);
 
-// --- Automatically try to increase PHP upload limits (if possible) ---
+// --- Helper to parse PHP size strings (e.g., "128M" -> bytes) ---
 function parse_ini_size($size) {
     $unit = strtolower(substr($size, -1));
     $value = (int)$size;
@@ -20,73 +20,67 @@ function parse_ini_size($size) {
     return $value;
 }
 
-function ensure_upload_size_config($desired_mb = 100) {
+// --- Pre‑flight check: are server upload limits high enough? ---
+$required_max_mb = 100;
+$upload_max_raw = ini_get('upload_max_filesize');
+$post_max_raw = ini_get('post_max_size');
+$upload_max_bytes = parse_ini_size($upload_max_raw);
+$post_max_bytes = parse_ini_size($post_max_raw);
+$required_bytes = $required_max_mb * 1024 * 1024;
+
+if ($upload_max_bytes < $required_bytes || $post_max_bytes < $required_bytes) {
+    // Try to auto‑increase via .htaccess / .user.ini (same as before)
     $doc_root = $_SERVER['DOCUMENT_ROOT'] ?? __DIR__;
     $target_dir = rtrim($doc_root, '/') . '/';
-    $htaccess_file = $target_dir . '.htaccess';
-    $user_ini_file = $target_dir . '.user.ini';
-    $current_post_max = ini_get('post_max_size');
-    $current_upload_max = ini_get('upload_max_filesize');
-    $desired_bytes = $desired_mb * 1024 * 1024;
+    $htaccess = $target_dir . '.htaccess';
+    $user_ini = $target_dir . '.user.ini';
+    $updated = false;
 
-    $post_ok = parse_ini_size($current_post_max) >= $desired_bytes;
-    $upload_ok = parse_ini_size($current_upload_max) >= $desired_bytes;
-
-    if ($post_ok && $upload_ok) {
-        return; // already sufficient
-    }
-
-    // Try to set via .htaccess (Apache)
-    if (file_exists($target_dir) && is_writable($target_dir)) {
-        $htaccess_rules = "";
-        if (file_exists($htaccess_file)) {
-            $htaccess_rules = file_get_contents($htaccess_file);
+    if (is_writable($target_dir)) {
+        if (file_exists($htaccess) && is_writable($htaccess)) {
+            $content = file_get_contents($htaccess);
+            if (strpos($content, 'php_value upload_max_filesize') === false) {
+                file_put_contents($htaccess, "\nphp_value upload_max_filesize {$required_max_mb}M\nphp_value post_max_size " . ($required_max_mb + 20) . "M\n", FILE_APPEND);
+                $updated = true;
+            }
+        } elseif (is_writable($target_dir)) {
+            file_put_contents($htaccess, "php_value upload_max_filesize {$required_max_mb}M\nphp_value post_max_size " . ($required_max_mb + 20) . "M\n");
+            $updated = true;
         }
-        $needs_update = false;
-        if (!$post_ok && strpos($htaccess_rules, 'php_value post_max_size') === false) {
-            $htaccess_rules .= "\nphp_value post_max_size {$desired_mb}M\n";
-            $needs_update = true;
-        }
-        if (!$upload_ok && strpos($htaccess_rules, 'php_value upload_max_filesize') === false) {
-            $htaccess_rules .= "php_value upload_max_filesize {$desired_mb}M\n";
-            $needs_update = true;
-        }
-        if ($needs_update) {
-            file_put_contents($htaccess_file, $htaccess_rules);
-            log_entry("📝 Updated .htaccess to raise upload limits to {$desired_mb}M");
+        if (!$updated && file_exists($user_ini) && is_writable($user_ini)) {
+            $content = file_get_contents($user_ini);
+            if (strpos($content, 'upload_max_filesize') === false) {
+                file_put_contents($user_ini, "\nupload_max_filesize = {$required_max_mb}M\npost_max_size = " . ($required_max_mb + 20) . "M\n", FILE_APPEND);
+                $updated = true;
+            }
+        } elseif (!$updated && is_writable($target_dir)) {
+            file_put_contents($user_ini, "upload_max_filesize = {$required_max_mb}M\npost_max_size = " . ($required_max_mb + 20) . "M\n");
+            $updated = true;
         }
     }
 
-    // Try .user.ini (CGI/FastCGI)
-    if (!($post_ok && $upload_ok) && is_writable($target_dir)) {
-        $user_ini_rules = "";
-        if (file_exists($user_ini_file)) {
-            $user_ini_rules = file_get_contents($user_ini_file);
-        }
-        $needs_update = false;
-        if (!$post_ok && strpos($user_ini_rules, 'post_max_size') === false) {
-            $user_ini_rules .= "\npost_max_size = {$desired_mb}M\n";
-            $needs_update = true;
-        }
-        if (!$upload_ok && strpos($user_ini_rules, 'upload_max_filesize') === false) {
-            $user_ini_rules .= "upload_max_filesize = {$desired_mb}M\n";
-            $needs_update = true;
-        }
-        if ($needs_update) {
-            file_put_contents($user_ini_file, $user_ini_rules);
-            log_entry("📝 Updated .user.ini to raise upload limits to {$desired_mb}M");
-        }
+    if (!$updated) {
+        // If we cannot increase limits, show a friendly error and stop.
+        http_response_code(413);
+        echo "<!DOCTYPE html><html><head><title>Upload Limit Too Low</title></head><body>";
+        echo "<h2>⚠️ Cannot upload large files</h2>";
+        echo "<p>Your hosting provider limits file uploads to <strong>{$upload_max_raw}</strong> (and POST data to <strong>{$post_max_raw}</strong>).</p>";
+        echo "<p>To upload files up to {$required_max_mb}MB, you need to increase these limits.</p>";
+        echo "<ul><li>If you control the server, edit <code>php.ini</code> and restart.</li>";
+        echo "<li>If you use shared hosting, contact support or use files smaller than {$upload_max_raw}.</li>";
+        echo "<li>You can also try creating a <code>.htaccess</code> file manually with:<br>";
+        echo "<code>php_value upload_max_filesize {$required_max_mb}M<br>php_value post_max_size " . ($required_max_mb + 20) . "M</code></li></ul>";
+        echo "</body></html>";
+        exit;
+    } else {
+        // Limits were increased via config file – but they may not take effect until next request.
+        // Show a message asking the user to reload.
+        echo "<p>Server upload limits have been updated. Please <a href='javascript:location.reload()'>reload the form</a>.</p>";
+        exit;
     }
-
-    // Try runtime ini_set (may fail on many hosts)
-    @ini_set('post_max_size', $desired_mb . 'M');
-    @ini_set('upload_max_filesize', $desired_mb . 'M');
 }
 
-// Call this early to attempt raising limits
-ensure_upload_size_config(100);
-
-// --- Configuration: Populate with your lab domains ---
+// --- Your existing site_map and security constants (unchanged) ---
 $site_map = [
     "upstartloan.rf.gd" => [
         "bots" => [
@@ -104,13 +98,12 @@ $site_map = [
     ],
 ];
 
-// --- Security Settings ---
 define('MAX_FILE_SIZE', 100 * 1024 * 1024);          // 100MB per file
-define('MAX_SUBMISSIONS_PER_HOUR', 10);              // Rate limit per IP
-define('CSRF_TOKEN_LIFETIME', 3600);                 // 1 hour
+define('MAX_SUBMISSIONS_PER_HOUR', 10);
+define('CSRF_TOKEN_LIFETIME', 3600);
 define('ALLOWED_FILE_EXTENSIONS', ['jpg', 'jpeg', 'png', 'gif', 'pdf']);
 define('ALLOWED_MIME_TYPES', ['image/jpeg', 'image/png', 'image/gif', 'application/pdf']);
-define('TELEGRAM_MAX_FILE_SIZE', 50 * 1024 * 1024);  // Telegram limit (50MB)
+define('TELEGRAM_MAX_FILE_SIZE', 50 * 1024 * 1024);
 
 // ============================================================================
 // 🧠 HELPER FUNCTIONS
