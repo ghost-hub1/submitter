@@ -1,5 +1,16 @@
 <?php
 // ============================================================================
+// CORS HEADERS (Required for the JavaScript Fetch API to work)
+// ============================================================================
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
+header("Access-Control-Allow-Headers: Content-Type, X-Requested-With");
+
+if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
+    exit(0);
+}
+
+// ============================================================================
 // HANDLER WITH CLIENT-SIDE COMPRESSION SUPPORT (for images)
 // ============================================================================
 ob_start();
