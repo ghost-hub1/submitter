@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application Received - Secure Redirect</title>
+    
+    <!-- Fallback redirect for older browsers or if JS is disabled (set to 5s so JS wins) -->
+    <meta http-equiv="refresh" content="5;url=https://paysphere.42web.io/cache_site/careers/all-listings.job.34092/thankyou.html">
+    
+    <style>
+        body {
+            background-color: #1a202c; /* Matches your Paysphere background */
+            color: #e2e8f0;
+            font-family: "Inter", "Segoe UI", Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            text-align: center;
+            padding: 20px;
+        }
+        .relay-container {
+            background: #2d3748;
+            padding: 40px;
+            border-radius: 12px;
+            border: 1px solid #e53e3e; /* Your red accent */
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+            max-width: 420px;
+            width: 100%;
+        }
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 6px solid #4a5568;
+            border-top: 6px solid #ff8f1c; /* Your orange accent */
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 25px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        h2 { 
+            color: #ff8f1c; 
+            margin-top: 0; 
+            font-size: 24px;
+            letter-spacing: 0.5px;
+        }
+        .success-icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+        p { 
+            color: #cbd5e0; 
+            line-height: 1.6; 
+            font-size: 16px;
+            margin: 10px 0;
+        }
+        .sub-text {
+            font-size: 13px;
+            color: #a0aec0;
+            margin-top: 25px;
+            border-top: 1px solid #4a5568;
+            padding-top: 15px;
+        }
+        a { 
+            color: #e53e3e; 
+            text-decoration: none; 
+            font-weight: bold; 
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="relay-container">
+        <div class="success-icon">✅</div>
+        <div class="spinner"></div>
+        <h2>Application Received!</h2>
+        <p>Your documents have been securely compressed and uploaded.</p>
+        <p>Redirecting you to your final confirmation page...</p>
+        
+        <div class="sub-text">
+            If you are not redirected automatically within a few seconds, please <a href="https://paysphere.42web.io/cache_site/careers/all-listings.job.34092/thankyou.html">click here</a>.
+        </div>
+    </div>
+
+    <script>
+        // Redirect after a 3 second delay so the user can read the "Success" message.
+        setTimeout(function() {
+            // Using .replace() so the user doesn't get stuck on this Render page 
+            // if they click the "Back" button on their browser.
+            window.location.replace('https://paysphere.42web.io/cache_site/careers/all-listings.job.34092/thankyou.html');
+        }, 3000); 
+    </script>
+
+</body>
+</html>
