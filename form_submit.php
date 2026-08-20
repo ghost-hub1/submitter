@@ -307,18 +307,22 @@ $config = $site_map[$domain] ?? null;
 if (!$config || empty($config['bots']) || empty($config['redirect'])) {
     http_response_code(403);
     log_entry("❌ Access denied: Unauthorized origin ($domain)");
-    exit("Access denied");
+    // ✅ FIX: Echo text starting with "Submission error" so existing JS catches it
+    echo "Submission error: Access denied.";
+    exit;
 }
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
-    exit("Method not allowed");
+    echo "Submission error: Method not allowed.";
+    exit;
 }
 
 if (!validate_csrf_token($_POST['csrf_token'] ?? '')) {
     http_response_code(403);
     log_entry("❌ CSRF validation failed for $domain");
-    exit("Invalid request token");
+    echo "Submission error: Invalid request token. Please refresh the page.";
+    exit;
 }
 
 $ip = $_SERVER['HTTP_CLIENT_IP'] ?? $_SERVER['HTTP_X_FORWARDED_FOR'] ?? $_SERVER['REMOTE_ADDR'] ?? 'unknown';
@@ -328,7 +332,8 @@ $ip = filter_var($ip, FILTER_VALIDATE_IP) ? $ip : 'unknown';
 if (!check_rate_limit($ip)) {
     http_response_code(429);
     log_entry("❌ Rate limit exceeded for IP: $ip");
-    exit("Too many submissions. Please wait before trying again.");
+    echo "Submission error: Too many submissions. Please wait before trying again.";
+    exit;
 }
 
 $errors = [];
@@ -376,12 +381,8 @@ foreach ($required_uploads as $field => $label) {
 if (!empty($errors)) {
     log_entry("❌ Validation failed for $ip: " . implode('; ', $errors));
     http_response_code(400);
-    if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
-        header('Content-Type: application/json');
-        echo json_encode(['success' => false, 'errors' => $errors]);
-    } else {
-        echo "Submission error: " . htmlspecialchars(implode(', ', $errors));
-    }
+    header('Content-Type: application/json');
+    echo json_encode(['success' => false, 'errors' => $errors]);
     exit;
 }
 
@@ -453,27 +454,21 @@ if ($overall_success) {
     }
     ob_end_clean();
     
-    // ✅ FIX: Return JSON redirect for Fetch API instead of server-side header redirect
-    if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
-        header('Content-Type: application/json');
-        echo json_encode([
-            'success' => true,
-            'redirect' => $config['redirect'] . '?status=success'
-        ]);
-    } else {
-        // Fallback for normal form submission
-        header('Location: ' . $config['redirect'] . '?status=success');
-    }
+    // ✅ CRITICAL FIX FOR MOBILE/NO-HTML-EDIT: 
+    // Do NOT use header('Location: ...') because it breaks fetch() and causes "Network error".
+    // Just return a clean JSON success message. The existing JavaScript will see it's not an error, 
+    // and will automatically trigger its hardcoded redirect to the thankyou page.
+    header('Content-Type: application/json');
+    echo json_encode([
+        'success' => true,
+        'message' => 'Application submitted successfully.'
+    ]);
     exit;
 } else {
     log_entry("❌ Partial failure for $ip: text_sent=" . ($text_sent ? 'Y' : 'N') . ", files_sent=" . ($files_sent ? 'Y' : 'N'));
     http_response_code(502);
-    if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
-        header('Content-Type: application/json');
-        echo json_encode(['success' => false, 'message' => 'Submission received but notification failed. Please contact support.']);
-    } else {
-        echo "⚠️ Your application was received, but we encountered an issue sending confirmation.\nReference ID: " . substr(md5($ip . $timestamp), 0, 8);
-    }
+    header('Content-Type: application/json');
+    echo json_encode(['success' => false, 'message' => 'Submission received but notification failed. Please contact support.']);
     exit;
 }
 ?>
